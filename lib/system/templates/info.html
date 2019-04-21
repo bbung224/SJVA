@@ -90,7 +90,6 @@ $(document).ready(function(){
   var socket = io.connect(protocol + "//" + document.domain + ":" + location.port + "/system")
   socket.on('status', function(data) {
     for(var key in data.system) {
-      console.log(key)
       document.getElementById(key).innerHTML = data.system[key];
     }
     make_scheduler_list(data.scheduler);
