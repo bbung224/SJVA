@@ -26,6 +26,8 @@ try:
 except:
     pass
 """
+# update:1
+# restart:2
 
 def start_app(port=None):
     if port is None: 
@@ -37,8 +39,13 @@ def start_app(port=None):
             print 'port is none.'
     try:
         framework.socketio.run(app, host='0.0.0.0', port=port)
+        print 'EXIT CODE : %s' % framework.exit_code
+        if framework.exit_code != -1:
+            sys.exit(framework.exit_code)
     except Exception as e:
         print e
+    except KeyboardInterrupt:
+        print 'KeyboardInterrupt !!'
 
 if __name__ == '__main__':
     try:
