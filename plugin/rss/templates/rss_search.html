@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+{% block content %}
+
+<form id="form_search" class="form-inline" style="text-align:left">
+  <div class="container-fluid">
+    <div class="row show-grid border border-secondary">
+      <div class="col-md-4 form-inline">
+        <div class="custom-control custom-radio col-md-3" style="align-items:left; text-align:left;">
+          <input id="site_radio" type="radio" name="radio" value="site" class="custom-control-input" checked>
+          <label class="custom-control-label" for="site_radio">기본</label>
+        </div>
+        <div class="col-md-5" style="align-items:left; text-align:left;">
+          <div id="site_select_div"></div>
+        </div>
+        <div class="col-md-4" style="align-items:left; text-align:left;">
+          <div id="board_select_div">
+            <select id="board_select" name="board_select" class="form-control form-control-sm"> \
+              <option value="all">전체</option>';
+            </select>
+          </div>
+        </div>
+      </div>
+    
+      <div class="col-md-3 form-inline " style="align-items:left; text-align:left;">
+        <div class="col-md-4" style="align-items:left; text-align:left;">
+          <div class="custom-control custom-radio">
+            <input id="group_radio" type="radio" name="radio" value="group" class="custom-control-input">
+            <label class="custom-control-label" for="group_radio">그룹</label>
+          </div>
+        </div>
+        <div class="col-md-8" style="align-items:left; text-align:left;">
+          <div id="group_select_div">
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-5 form-inline " style="align-items:left; text-align:left;">
+        <div class="col-md-3" style="align-items:left; text-align:left;">
+          <select id="search_select" name="search_select" class="form-control form-control-sm">
+            <option value="title">제목</option>
+            <option value="filename">파일명</option>
+            <option value="magnet">magnet</option>
+          </select>
+        </div>
+        <div class="col-md-7" style="align-items:left; text-align:left;">
+          <input id="search_word" name="search_word" class="form-control form-control-sm w-100" type="text" placeholder="검색어" aria-label="Search">
+        </div>
+        <div class="col-md-2" style="align-items:left; text-align:left;">
+          <button id="search" class="btn btn-sm btn-outline-success">검색</button>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</form>
+<div id='page1'></div>
+<div id="list_div"></div>
+<div id='page2'></div>
+
+<script type="text/javascript">
+var currentData = null;
+
+$(document).ready(function(){
+  $.ajax({
+    url: '/rss/ajax/list',
+    type: "POST",
+    cache: false,
+    data: {load:true},
+    dataType: "json",
+    success: function (data) {
+      currentData = data;
+      make_list_html(data.list);
+      make_page_html(data.paging);
+      make_form(data.info);
+    }
+  });
+
+  $("#search").click(function(e) {
+    e.preventDefault();
+    request_search('1');
+  });
+
+  // pageing
+  $("body").on('click', '#page', function(e){
+    e.preventDefault();
+    request_search($(this).data('page'));
+  });
+
+  $("body").on('change', '#site_select', function(e){
+  //$("#site_select").change(function(e){
+    e.preventDefault();
+    site = document.getElementById("site_select").value;
+    $("#board_select").empty();
+    str = '<select id="board_select" name="board_select" class="form-control form-control-sm"> \
+            <option value="all">전체</option>';
+                
+    for(var i in currentData.info.board[site]) {
+      str += '<option value="' + currentData.info.board[site][i] + '">' + currentData.info.board[site][i] + '</option>';
+    }
+    str += '</select>';
+    document.getElementById("board_select_div").innerHTML = str;
+  });
+
+  $("body").on('change', '#site_radio', function(e){
+  //$("#site_select").change(function(e){
+    e.preventDefault();
+    if ( $('#site_radio').is(':checked') ) {
+      document.getElementById("group_select").setAttribute("disabled","disabled");
+      document.getElementById("site_select").removeAttribute("disabled");
+       document.getElementById("board_select").removeAttribute("disabled");
+     }
+  });
+
+  $("body").on('change', '#group_radio', function(e){
+  //$("#site_select").change(function(e){
+    e.preventDefault();
+    if ( $('#group_radio').is(':checked') ) {
+      document.getElementById("group_select").removeAttribute("disabled");
+      document.getElementById("site_select").setAttribute("disabled","disabled");
+      document.getElementById("board_select").setAttribute("disabled","disabled");
+    }
+  });
+
+
+
+
+});
+
+
+function make_list_html(data) {
+  /*
+  str = '<div class="row"> \
+          <div class="col-sm-1" style="text-align:center;" style="padding-top:0px; padding-bottom:0px">ID</div> \
+          <div class="col-sm-1" style="text-align:center;" style="padding-top:0px; padding-bottom:0px">시간</div> \
+          <div class="col-sm-1" style="text-align:left;" style="padding-top:0px; padding-bottom:0px">사이트</div> \
+          <div class="col-sm-1" style="text-align:left;" style="padding-top:0px; padding-bottom:0px">게시판</div> \
+          <div class="col-sm-7" style="text-align:left;" style="padding-top:0px; padding-bottom:0px">마지막 게시물</div> \
+        </div> \
+        <hr style="width: 100%; color: black; height: 2px; background-color:black;" />'
+  */
+  str = '<hr style="width: 100%; color: black; height: 2px; background-color:black;" />';        
+  for(var i in data) {
+    str += ' \
+      <div class="row"> \
+        <div class="col-sm-1" style="text-align: center;" style="padding-top:0px; padding-bottom:0px">'
+    str += data[i].id;
+    str += '\
+        </div> \
+        <div class="col-sm-2" style="text-align: left;" style="padding-top:0px; padding-bottom:0px"> \
+          ' + data[i].created_time + ' \
+        </div> \
+        <div class="col-sm-1" style="text-align: left;" style="padding-top:0px; padding-bottom:0px"> \
+          ' + data[i].site + ' \
+        </div> \
+        <div class="col-sm-2" style="text-align: left;" style="padding-top:0px; padding-bottom:0px"> \
+          ' + data[i].board + '<br>' + data[i].board_id + ' \
+        </div> \
+        <div class="col-sm-6" style="text-align: left;" style="padding-top:0px; padding-bottom:0px">';
+    //str += '<pre>' + JSON.stringify(data[i], null, 2) + '</pre>';
+    str += '<pre>';
+    str += '<a href="'+data[i].url +'" target="_blank">' + data[i].title + '</a>'
+    str += '<br><hr style="width: 100%; margin-bottom:4px; margin-top:4px; bottom=0px;" />';
+
+    for (var j in data[i].files) {
+      if (data[i].files[j].link != '') {
+        str += '<a href="/rss/download/' + data[i].files[j].id+ '">' + data[i].files[j].filename + '</a><br>';
+      }
+      str += '<a href="'+data[i].files[j].magnet + '">' + data[i].files[j].magnet + '</a>';
+      if (j != data[i].files.length-1) {
+        str += '<hr style="width: 100%; margin-bottom:4px; margin-top:4px; bottom=0px;" />';
+        //str += '<hr>';
+      }
+    } 
+    str += '</pre>';
+    /*
+    str += ' \
+          <div class="input-group col-sm-6" style="padding-left:0px"> \
+            <span class="text-left" > \
+              <button id="remove_scheduler_btn" class="btn btn-sm btn-outline-success" data-id="' + data[i].id + '">스케쥴 삭제</button> \
+            </span> \
+          </div>'
+    */
+    str += ' \
+        </div> \
+      </div> \
+      <hr style="width: 100%; margin-top:2px;" />';
+  }
+  document.getElementById("list_div").innerHTML = str;
+}
+
+function make_page_html(data) {
+  str = ' \
+    <div class="d-inline-block"></div> \
+      <div class="row"> \
+        <div class="col-sm-12"> \
+          <div class="btn-toolbar" style="justify-content: center;" role="toolbar" aria-label="Toolbar with button groups" > \
+            <div class="btn-group btn-group-sm mr-2" role="group" aria-label="First group">'
+  if (data.prev_page) {
+    str += '<button id="page" data-page="' + (data.start_page-1) + '" type="button" class="btn btn-secondary">&laquo;</button>'
+  }
+
+  for (var i = data.start_page ; i <= data.last_page ; i++) {
+    str += '<button id="page" data-page="' + i +'" type="button" class="btn btn-secondary" ';
+    if (i == data.current_page) {
+      str += 'disabled';
+    }
+    str += '>'+i+'</button>';
+  }
+  if (data.next_page) {
+    str += '<button id="page" data-page="' + (data.last_page+1) + '" type="button" class="btn btn-secondary">&raquo;</button>'
+  }
+
+  str += '</div> \
+    </div> \
+    </div> \
+    </div> \
+  '
+  document.getElementById("page1").innerHTML = str;
+  document.getElementById("page2").innerHTML = str;  
+}
+
+function request_search(page) {
+  var formData = $('#form_search').serialize(); 
+  formData += '&site_radio=' + $('#site_radio').is(':checked')
+  formData += '&page=' + page;
+  $.ajax({
+    url: '/rss/ajax/list',
+    type: "POST", 
+    cache: false,
+    data: formData,
+    dataType: "json",
+    success: function (data) {
+      make_list_html(data.list);
+      make_page_html(data.paging);
+    }
+  });
+}
+  
+function make_form(data) {
+  str = '<select id="site_select" name="site_select" class="form-control form-control-sm">';
+  str += '<option value="all">전체</option>';
+  for(var i in data.site) {
+    str += '<option value="' + data.site[i] + '">' + data.site[i] + '</option>';
+  }
+  str += '</select>';
+  document.getElementById("site_select_div").innerHTML = str;
+
+  str = '<select id="group_select" name="group_select" class="form-control form-control-sm" disabled> \
+              <option value="all">전체</option>'
+  for(var i in data.group) {
+    str += '<option value="' + data.group[i].groupname + '">' + data.group[i].groupname + '</option>';
+  }
+  str += '</select>';
+  document.getElementById("group_select_div").innerHTML = str;
+
+}
+
+
+
+</script>    
+{% endblock %}

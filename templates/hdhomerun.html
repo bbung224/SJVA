@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="">
+    <table class="table table-striped">
+      <tbody>
+        <tr>
+          <td>
+            <a class="btn btn-primary" href="/tools/hdhomerun?action=setting" role="button">Status</a>
+            <a class="btn btn-primary" href="/tools/hdhomerun?action=scan" role="button">Scan</a>
+            <a class="btn btn-primary" href="/tools/hdhomerun?action=list&sortby=virtual" role="button">Channel List</a>
+          </td>
+        </tr>
+      </tbody>
+    <table>
+    {% if action == 'list' %}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          {% if (sortby == 'virtual' and sorttype == 'asc') %}
+          <th scope="col"><a href="/tools/hdhomerun?action=list&sortby=virtual&sorttype=desc">채널번호</a></th>
+          {% else %}
+          <th scope="col"><a href="/tools/hdhomerun?action=list&sortby=virtual&sorttype=asc">채널번호</a></th>
+          {% endif %}
+          {% if (sortby == 'name' and sorttype == 'asc') %}
+          <th scope="col"><a href="/tools/hdhomerun?action=list&sortby=name&sorttype=desc">채널이름</a></th>
+          {% else %}
+          <th scope="col"><a href="/tools/hdhomerun?action=list&sortby=name&sorttype=asc">채널이름</a></th>
+          {% endif %}
+          {% if (sortby == 'frequency' and sorttype == 'asc') %}
+          <th scope="col"><a href="/tools/hdhomerun?action=list&sortby=frequency&sorttype=desc">주파수</a></th>
+          {% else %}
+          <th scope="col"><a href="/tools/hdhomerun?action=list&sortby=frequency&sorttype=asc">주파수</a></th>
+          {% endif %}
+          {% if (sortby == 'program' and sorttype == 'asc') %}
+          <th scope="col"><a href="/tools/hdhomerun?action=list&sortby=program&sorttype=desc">PID</a></th>
+          {% else %}
+          <th scope="col"><a href="/tools/hdhomerun?action=list&sortby=program&sorttype=asc">PID</a></th>
+          {% endif %}
+          <th scope="col">View</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for item in channel_list %}
+        <tr>
+          <th scoper="row">{{item.virtual}}</th>
+          <td>{{ item.name }}</td>
+          <td>{{ item.frequency }}</td>
+          <td>{{ item.program }}</td>
+          <td> <a class="btn btn-info btn-sm" href="/tools/hdhomerun?action=view&frequency={{ item.frequency }}&program={{item.program}}&name={{item.name}}" role="button">View</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% elif action == 'setting'%}
+    <SCRIPT TYPE="TEXT/JAVASCRIPT">
+      //<![CDATA[
+      function fileUpload(fis) {
+      var str = fis.value;
+      alert("파일네임: "+ fis.value.substring(str.lastIndexOf("\\")+1));
+      }
+      //]]>
+      </SCRIPT> 
+      
+     
+    <li>VLC 경로</li>
+    <a href="rtp://192.168.0.11:9998">aaaa</a>
+    <OBJECT classid="clsid:9BE31822-FDAD-461B-AD51BE1D1C159921" codebase="http://download.videolan.org/pub/videolan/vlc/2.2.4/win32/vlc-2.2.4-win32.exe " width="100%" height="100%" id="vlc" events="True">
+      <embed type="application/x-vlc-plugin" pluginspage="http://www.videolan.org " name="vlc" />
+      <param name="Src" value="rtp://192.168.0.11:9998" />
+      <param name="autostart" value="true" />
+      <param name="ShowDisplay" value="false" />
+      <param name="AutoLoop" value="false" />
+      <param name="AutoPlay" value="true" />
+      <OBJECT>
+          <input type="file" onchange="fileUpload(this)">
+    {% endif %}
+  </div>
+{% endblock %}

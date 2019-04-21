@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<div>
+  <nav>
+    {{ macros.m_tab_head_start() }}
+      {{ macros.m_tab_head('Remotes', true) }}
+      {{ macros.m_tab_head('작업', false) }}
+    {{ macros.m_tab_head_end() }}
+  </nav>
+  <div class="tab-content" id="nav-tabContent">
+    <!-- 일반 -->
+    {{ macros.m_tab_content_start('Remotes', true) }}
+      {{ macros.setting_input_text_and_buttons('path_rclone', 'RCLONE Path', [['rclone_path_test_btn', '버전확인'], ['rclone_config_btn', 'Config']], value=arg['path_rclone'], disabled=True) }}
+      {{ macros.m_hr_black() }}
+      {{ macros.m_row_start() }}
+      {{ macros.m_col(1,  macros.m_strong('NO'), align='center') }}
+      {{ macros.m_col(2,  macros.m_strong('Name'), align='center') }}
+      {{ macros.m_col(1,  macros.m_strong('Type'), align='center') }}
+      {{ macros.m_col(8,  macros.m_strong('Detail'), align='center') }}
+      {{ macros.m_row_end() }}
+      {{ macros.m_hr_head() }}
+      <div id="remotes_list_div"></div>
+    {{ macros.m_tab_content_end() }}
+
+    {{ macros.m_tab_content_start('작업', false) }}
+      {{ macros.m_row_start() }}  
+      {{ macros.m_button('job_add_btn', '작업 추가') }}
+      {{ macros.m_row_end() }}  
+      {{ macros.m_hr() }}
+      {{ macros.setting_top('전체 스케쥴링 작동') }}
+      <div class="input-group col-sm-3">
+        {% if arg['scheduler'] == 'True' %}
+        <input id="scheduler" name="scheduler" class="form-control form-control-sm" type="checkbox" data-toggle="toggle" checked>
+        {% else %}
+        <input id="scheduler" name="scheduler" class="form-control form-control-sm" type="checkbox" data-toggle="toggle">
+        {% endif %}
+        {% if arg['is_running'] == 'True' %}
+          <span style="padding-left:10px; padding-top: 8px;">동작중</span>
+        {% else %}    
+          {% if arg['scheduler'] == 'True' %}
+            <span style="padding-left:10px; padding-top: 8px;">대기중</span>
+          {% endif %}  
+        {% endif %}    
+      </div>
+      {{ macros.setting_bottom(['On : 스케쥴링 시작','Off : 스케쥴링 중지']) }}
+
+      <form id='setting' name='setting'>
+        {{ macros.setting_input_int('interval', '스케쥴링 실행 주기', value=arg['interval'], min='1', placeholder='10', desc='minute 단위') }}
+    
+        {{ macros.setting_checkbox('auto_start', '시작시 자동실행', value=arg['auto_start'], desc='On : 시작시 자동으로 스케쥴러에 등록됩니다.') }}
+
+        {{ macros.setting_button([['setting_save_btn', '저장']]) }}
+      </form>
+    {{ macros.m_tab_content_end() }}
+
+  </div><!--tab-content-->
+</div> <!--전체-->
+
+
+{{ macros.m_modal_start('job_add_modal', '작업 추가', 'modal-lg') }}
+  {{ macros.setting_radio('job_type', '타입', ['사용자', '자동(타 플러그인)'])}}
+  {{ macros.setting_select('job_command', 'Command', [['move', 'Move'],['copy', 'Copy'],['sync', 'Sync']], col='3', desc='Rclone 명령어')}}
+  {{ macros.setting_select('job_remote', 'Remote', [], col='3')}}
+  
+{{ macros.m_modal_end() }}
+
+
+    
+
+
+
+
+
+<script type="text/javascript">
+var current_data = null;
+
+$(document).ready(function(){
+  var package_name = 'rclone';
+
+  $.ajax({
+    url: '/' + package_name + '/ajax/load_remotes',
+    type: "POST", 
+    cache: false,
+    data:{},
+    dataType: "json",
+    success: function (data) {
+      current_data = data;
+      //document.getElementById("modal_title").innerHTML = "ffmpeg -version";
+      //document.getElementById("modal_body").innerHTML = "<pre>"+JSON.stringify(data, null, 2) + "</pre>";
+      //$("#large_modal").modal();
+      make_remotes_list(data.remotes);
+    }
+  });
+
+  // rclone 버전 버튼
+  $("body").on('click', '#rclone_path_test_btn', function(e){
+    e.preventDefault();
+    $.ajax({
+      url: '/' + package_name + '/ajax/rclone_version',
+      type: "POST", 
+      cache: false,
+      data:{},
+      dataType: "json",
+      success: function (data) {
+        var str = '';
+        for (var i = 0; i < data.length; i++) {
+          str += "<div>" + data[i] + "</div>";
+        }
+        document.getElementById("normal_modal_title").innerHTML = "Rclone version";
+        document.getElementById("normal_modal_body").innerHTML = str;
+        $("#normal_modal").modal();
+      }
+    });
+  });
+
+  // rclone config 버튼
+  $("body").on('click', '#rclone_config_btn', function(e){
+    e.preventDefault();
+    //command = path_rclone + ' --config ' + path_config + ' ' + document.getElementById("command").value;
+    //redirect = '/command/api/command'
+    //$.redirectPost(redirect, {command: command});
+    //command = document.getElementById("command").value;
+    command = 'config';
+    $.ajax({
+      url: '/' + package_name + '/ajax/send_to_command_plugin',
+      type: "POST", 
+      cache: false,
+      data:{command:command},
+      dataType: "json",
+      success: function (data) {
+        //document.getElementById("process_command").value = '';
+        redirect = '/command/api/command'
+        $.redirectPost(redirect, {command: data});
+      }
+    });
+  });
+
+
+  // 작업추가 버튼
+  $("body").on('click', '#job_add_btn', function(e){
+    e.preventDefault();
+    $("#job_add_modal").modal();
+    
+  });
+
+
+
+  
+
+
+
+
+
+
+
+
+function make_remotes_list(data) {
+  str = ''
+  for (i in data) {
+    str += m_row_start_top();
+    str += m_col(1, (parseInt(i)+1), 'center');
+    str += m_col(2, data[i].name, 'center');
+    str += m_col(1, data[i].type, 'center');
+    tmp = ''
+    for (key in data[i]) {
+      tmp += m_row_start(padding="0");
+      if (key != 'type') {
+        tmp += m_col(3, key, align='right');
+        tmp += m_col(9, data[i][key]);
+      }
+      tmp += m_row_end();
+    }
+    str += m_col(8, tmp);
+    str += m_row_end();
+    str += m_hr();
+  }
+  document.getElementById("remotes_list_div").innerHTML = str;
+}
+
+
+  
+  
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>    
+{% endblock %}

@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if sub == 'setting' %}
+  <div>
+    <!--
+    <style>
+      .row>div { padding-top: 10px; padding-bottom:20px; text-align: center; border: 1px solid gray; }
+      .row>div:nth-child(odd) { background: orange; }
+      .row>div:nth-child(even) { background: yellow; }
+      .row { margin: 10; }
+    </style>
+    -->
+    <style>
+      .row>div { padding-top: 10px; padding-bottom:10px; }
+      .row { align-items: center;}
+      .row>div:nth-child(odd) { align-items: right; text-align: right; }
+      .row>div:nth-child(even) { align-items: left; text-align: left; }
+    </style>
+    <div class="page-header">
+      <h3>FFMPEG 다운로드 설정<small></small></h3>
+    </div>
+    <hr>
+    <div class='row'>
+      <div class='col-sm-3' >
+        <strong>FFMPEG 경로</strong>
+      </div>
+      <div class='col-sm-9'>
+        <div class="input-group col-sm-9">
+          <input id="ffmpeg_path" type="text" class="form-control" placeholder="FFMPEG 경로" aria-describedby="basic-addon1" value="{{arg[5]}}" disabled >
+          <span class='text-left' style="padding-left:10px; padding-top:3px">
+            <button id="ffmpeg_version" name="submit" class="btn btn-sm btn-outline-success">버전확인</button>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='col-sm-3' >
+        <strong>임시 폴더</strong>
+      </div>
+      <div class='col-sm-9'>
+        <div class="input-group col-sm-9">
+          <input id="temp_path" type="text" class="form-control" placeholder="임시 폴더 경로" aria-describedby="basic-addon1" value="{{arg[0].value}}">
+        </div>
+        <div class='text-left' style="padding-left:20px; padding-top:5px;">
+          <em>다운로드 파일이 임시로 저장될 폴더 입니다. </em>
+        </div>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='col-sm-3'>
+        <strong>저장 폴더</strong>
+      </div>
+      <div class='col-sm-9'>
+        <div class="input-group col-sm-9">
+          <span class="input-group-addon" id="basic-addon1"></span>
+          <input id="save_path" type="text" class="form-control" placeholder="저장 폴더 경로" aria-describedby="basic-addon1" value="{{arg[1].value}}">
+        </div>
+        <div class='text-left' style="padding-left:20px; padding-top:5px;">
+          <em>정상적으로 완료된 파일이 이동할 폴더 입니다. </em>
+        </div>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='col-sm-3'>
+        <strong>허용 Packet Fail 수</strong>
+      </div>
+      <div class='col-sm-9'>
+        <div class="input-group col-sm-2">
+          <span class="input-group-addon" id="basic-addon1"></span>
+          <input id="max_pf_count" type="number" min="0" class="form-control" placeholder="0" aria-describedby="basic-addon1" value="{{arg[2].value}}">
+        </div>
+        <div style="padding-left:20px; padding-top:5px;">
+            <em>이 값보다 Packet Fail 횟수가 더 많으면 실패처리 합니다.<br>
+            0일 경우 Packet Fail이 발생하면 바로 실패처리.
+          </em>
+        </div>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='col-sm-3' style="text-align: right; vertical-align: middle;">
+        <strong>임시 파일</strong>
+      </div>
+      <div class='col-sm-9'>
+        <div class="checkbox" style="padding-left:15px;">
+          {% if arg[4].value == "true" %}
+            <input id="if_fail_remove_tmp_file" type="checkbox" checked>
+          {% else %}
+            <input id="if_fail_remove_tmp_file" type="checkbox">
+          {% endif %}
+          <span style="padding-left:5px;">실패시 임시 파일 자동 삭제</span>
+        </div>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='col-sm-3 text-right'></div>
+      <div class='col-sm-9'>
+        <div class="col-sm-6 text-left">
+          <button id="setting_save" name="submit" class="btn btn-outline-success">저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% elif sub == 'download' %}
+<div>
+  <style>
+    .row>div { padding-top: 10px; padding-bottom:10px; }
+    .row { align-items: center;}
+    .row>div:nth-child(odd) { align-items: right; text-align: right; }
+    .row>div:nth-child(even) { align-items: left; text-align: left; }
+  </style>
+  <div class="page-header">
+    <h3>FFMPEG 다운로드<small></small></h3>
+  </div>
+  <hr>
+  <div class='row'>
+    <div class='col-sm-3' >
+      <strong>URL</strong>
+    </div>
+    <div class='col-sm-9'>
+      <div class="input-group col-sm-9">
+        <input id="url" type="text" class="form-control" placeholder="URL" aria-describedby="basic-addon1" value="">
+      </div>
+    </div>
+  </div>
+  <div class='row'>
+    <div class='col-sm-3' >
+      <strong>파일명</strong>
+    </div>
+    <div class='col-sm-9'>
+      <div class="input-group col-sm-9">
+        <input id="filename" type="text" class="form-control" placeholder="파일명" aria-describedby="basic-addon1" value="{{arg}}">
+      </div>
+    </div>
+  </div>
+  <div class='row'>
+    <div class='col-sm-3'></div>
+      <div class='col-sm-9'>
+        <div class="col-sm-6">
+          <button id="download_start" name="submit" class="btn btn-outline-success">다운로드</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+
+</div>
+{% endif %} 
+
+<script type="text/javascript">
+$(document).ready(function(){
+  //설정 저장
+  $("#setting_save").click(function(e) {
+    e.preventDefault();
+    $.ajax({
+      url: '/ffmpeg/ajax/setting_save',
+      type: "POST", 
+      cache: false,
+      data:{ temp_path : $("#temp_path").val(), save_path:$("#save_path").val(), max_pf_count: $("#max_pf_count").val(), retry_count:$("#retry_count").val(), if_fail_remove_tmp_file : $("#if_fail_remove_tmp_file").is(":checked")},
+      dataType: "json",
+
+      success: function (ret) {
+        if (ret == 'success') {
+          $.notify('<strong>설정을 저장하였습니다.</strong>', {
+	          type: 'success'
+          });
+        } else {
+          $.notify('<strong>설정을 저장하지 못하였습니다.</strong>', {
+	          type: 'warning'
+          });
+        }
+      }
+    });
+  });
+
+  //버전
+  $("#ffmpeg_version").click(function(e) {
+    e.preventDefault(); 
+    $.ajax({
+      url: '/ffmpeg/ajax/ffmpeg_version',
+      type: "POST", 
+      cache: false,
+      data:{  },
+      dataType: "json",
+      success: function (list) {
+        var str = '';
+        for (var i = 0; i < list.length; i++) {
+          str += "<div>" + list[i] + "</div>";
+        }
+        document.getElementById("modal_title").innerHTML = "ffmpeg -version";
+        document.getElementById("modal_body").innerHTML = str;
+        //$("#modal_title").innerHTML = 
+        //$("#modal_body").innerHTML = list;
+        $("#large_modal").modal();
+      }
+    });
+  });
+
+  //다운로드시작
+  $("#download_start").click(function(e) {
+    e.preventDefault();
+    if ($("#url").val().startsWith('http') == false) {
+      $.notify('<strong>URL을 입력하세요.</strong>', {
+        type: 'warning'
+      });
+      return;
+    }
+    $.ajax({
+      url: '/ffmpeg/ajax/download',
+      type: "POST", 
+      cache: false,
+      data: {url: $("#url").val(), filename: $("#filename").val()},
+      dataType: "json",
+      success: function (data) {
+        $.notify('<strong>분석중..</strong>', {
+          type: 'info'
+        });
+      }
+    });
+  });
+
+  
+
+
+});
+
+
+
+
+  
+
+
+
+</script>    
+{% endblock %}

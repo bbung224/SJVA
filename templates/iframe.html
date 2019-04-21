@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row" style="align-items: center; text-align: center;">
+  
+      <iframe id="iframe" class="embed-responsive"  src="{{site}}" frameborder="0" scrolling="no" allowfullscreen></iframe>
+  
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    function Resize() {
+      ClientHeight = window.innerHeight
+      $("#iframe").height(ClientHeight-150);
+    }
+    $(window).resize(function() {
+      Resize();
+    });
+    Resize()
+  })
+</script> 
+
+{% endblock %}

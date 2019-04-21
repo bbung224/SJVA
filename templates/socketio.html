@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            var socket = io.connect("http://" + document.domain + ":" + location.port + "/test");
+            console.log(socket);
+            
+            socket.on('response', function(msg){
+                
+                $("#received").append('<p> ' + msg.username + ': ' + msg.data + '</p>');
+            });
+
+            $("form#broadcast").submit(function(event){
+                if($("#input-data").val() == "")
+                {
+                    return false;
+                }
+                console.log($("#input-data").val());
+                socket.emit("request123", {data: $("#input-data").val()});
+                console.log('send end');
+                $("#input-data").val("");
+                return false;
+            });
+        });
+    </script>
+    <meta charset="UTF-8">
+    <title>websock test</title>
+</head>
+<body>
+ 
+<h1>Received</h1>
+<div id="received">
+ 
+</div>
+ 
+<form id="broadcast" action="#">
+    <input id="input-data" type="text"/>
+    <input type="submit"/>
+</form>
+ 
+</body>
+</html>

@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if sub == 'auto' %}
+  
+<div>
+  <nav>  
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+      <a class="nav-item nav-link active" id="nav-list-tab" data-toggle="tab" href="#nav-list" role="tab" aria-controls="nav-list" aria-selected="true">목록</a>
+      <a class="nav-item nav-link" id="nav-setting-tab" data-toggle="tab" href="#nav-setting" role="tab" aria-controls="nav-setting" aria-selected="false">설정</a>
+    </div>
+  </nav>
+
+  <div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-list" role="tabpanel" aria-labelledby="nav-list-tab">
+
+    <form id="form_search" class="form-inline" style="text-align:left">
+      <div class="container-fluid">
+        <div class="row show-grid">
+          <span class="col-md-4">
+            <select id="order" name="order" class="form-control form-control-sm">
+              <option value="desc">최근순</option>
+              <option value="asc">오래된순</option>
+            </select>
+            <select id="option" name="option" class="form-control form-control-sm">
+              <option value="all">전체</option>
+              <option value="completed">다운로드 완료</option>
+              <option value="uncompleted">다운로드 미완료</option>
+              <option value="user_abort">사용자 중지</option>
+              <option value="pf_abort">PF 중지</option>
+              <option value="etc_abort_under_10">FFMPEG 에러</option>
+              <option value="etc_abort_11">패스 - QVOD</option>
+              <option value="etc_abort_12">패스 - 제외 채널</option>
+              <option value="etc_abort_13">패스 - 제외 프로그램</option>
+            </select>
+          </span>
+          <span class="col-md-8">
+            <input id="program" name="program" class="form-control form-control-sm w-75" type="text" placeholder="프로그램명" aria-label="Search">
+            <button id="search" class="btn btn-sm btn-outline-success">검색</button>
+            <button id="reset_btn" class="btn btn-sm btn-outline-success">리셋</button>
+          </span>
+        </div>
+      </div>
+    </form>
+    <div id='page1'></div>
+    <div id="list"></div>
+    <div id='page2'></div>
+  </div> <!--tab-->
+      
+
+  <div class="tab-pane fade" id="nav-setting" role="tabpanel" aria-labelledby="nav-setting-tab">
+    
+    {{ macros.setting_top('스케쥴링 작동') }}
+      <div class="input-group col-sm-3">
+        {% if arg['scheduler'] == 'True' %}
+        <input id="scheduler" name="scheduler" class="form-control form-control-sm" type="checkbox" data-toggle="toggle" checked>
+          
+        {% else %}
+        <input id="scheduler" name="scheduler" class="form-control form-control-sm" type="checkbox" data-toggle="toggle">
+        {% endif %}
+        {% if arg['is_running'] == 'True' %}
+          <span style="padding-left:10px; padding-top: 8px;">동작중</span>
+        {% else %}    
+          {% if arg['scheduler'] == 'True' %}
+            <span style="padding-left:10px; padding-top: 8px;">대기중</span>
+          {% endif %}  
+        {% endif %}    
+      </div>
+    {{ macros.setting_bottom(['On : 스케쥴링 시작','Off : 스케쥴링 중지']) }}
+
+    <form id='setting' name='setting'>
+    {{ macros.setting_input_int('auto_interval', '스케쥴링 실행 주기', value=arg['auto_interval'], min='1', placeholder='10', desc='minute 단위') }}
+
+    {{ macros.setting_checkbox('auto_start', '시작시 자동실행', value=arg['auto_start'], desc='On : 시작시 자동으로 스케쥴러에 등록됩니다.') }}
+    
+    {{ macros.setting_input_text('auto_save_path', '저장 폴더', value=arg['auto_save_path'], desc='정상적으로 완료된 파일이 이동할 폴더 입니다. ') }}
+    
+    {{ macros.setting_top('기본 화질') }}
+        <div class="input-group col-sm-3">
+          <select id="auto_quality" name="auto_quality" class="form-control form-control-sm" value="{{arg['quality']}}"> 
+            <option value="FHD">FHD</option>
+            <option value="HD">HD</option>
+            <option value="SD">SD</option>
+          </select>
+        </div>
+    {{ macros.setting_bottom() }}
+
+    {{ macros.setting_input_int('auto_page', '탐색 페이지수', value=arg['auto_page'], min='1', placeholder='2') }}
+
+    {{ macros.setting_checkbox('retry_user_abort', '사용자 중지 항목 다시 받기', value=arg['retry_user_abort'], desc='On : 다음 스케쥴링 때 다시 받습니다.') }}
+
+    {{ macros.setting_checkbox('qvod_download', 'Quick VOD 받기', value=arg['qvod_download']) }}
+
+    {{ macros.setting_input_text('except_channel', '제외 채널', value=arg['except_channel'], desc=[',로 구분', '채널 이름과 일치하면 제외합니다.']) }}
+    
+    {{ macros.setting_input_text('except_program', '제외 프로그램', value=arg['except_program'], desc=[',로 구분', '이 곳에 있는 항목이 프로그램에 이름에 포함되어 있으면 제외합니다.']) }}
+
+    {{ macros.setting_input_text('download_program_in_qvod', 'Quick VOD 중 다운받을 프로그램', value=arg['download_program_in_qvod'], desc=[',로 구분', 'Quick VOD 받기가 Off 일때, 다운받을 프로그램 이름', 'Quick VOD가 On일 경우에는 이 설정과 상관없이 모두 다운']) }}
+
+    {{ macros.setting_top() }}
+        <div class="col-sm-6 text-left">
+          <button id="setting_save" name="submit" class="btn btn-outline-success">저장</button>
+        </div>
+    {{ macros.setting_bottom() }}
+    </form>
+
+  </div> <!--탭-->
+</div>
+
+{% endif %} 
+
+<script type="text/javascript">
+var current_data = null;
+$(document).ready(function(){
+  // 스케쥴링 on / off
+  $('#scheduler').change(function() {
+    var ret = $(this).prop('checked');
+    $.ajax({
+      url: '/pooq/ajax/auto',
+      type: "POST", 
+      cache: false,
+      data: { scheduler : ret},
+      dataType: "json",
+      success: function (list) {
+      }
+    });
+  });
+
+  //설정 저장
+  $("#setting_save").click(function(e) {
+    e.preventDefault();
+    var checkboxs = [$('#auto_start'), $('#retry_user_abort'), $('#qvod_download')];
+    for (var i in checkboxs) {
+	    if ( checkboxs[i].is(':checked') ) {
+        checkboxs[i].val('True');
+      } else {
+        checkboxs[i].val('False');
+      }
+    }
+    var formData = $('#setting').serialize(); 
+    $.each($('form input[type=checkbox]')
+      .filter(function(idx) {
+        return $(this).prop('checked') === false 
+      }), 
+      function(idx, el) { 
+        var emptyVal = "False"; 
+        formData += '&' + $(el).attr('name') + '=' + emptyVal; 
+      }
+    );
+
+
+    $.ajax({
+      url: '/pooq/ajax/setting_save',
+      type: "POST", 
+      cache: false,
+      data: formData,
+      dataType: "json",
+      success: function (ret) {
+        if (ret == 0) {
+          $.notify('<strong>설정을 저장하였습니다.</strong>', {
+	          type: 'success'
+          });
+        } else {
+          $.notify('<strong>설정 저장에 실패하였습니다.</strong>', {
+	          type: 'warning'
+          });
+        }
+      }
+    });
+  });
+
+  // 로딩
+  $(function() {
+    $.ajax({
+      url: '/pooq/ajax/auto_list',
+      type: "POST", 
+      cache: false,
+      data: {},
+      dataType: "json",
+      success: function (data) {
+        make_list(data);
+      }
+    });
+  });
+
+  $("#search").click(function(e) {
+    e.preventDefault();
+    var formData = $('#form_search').serialize();
+    $.ajax({
+      url: '/pooq/ajax/auto_list',
+      type: "POST", 
+      cache: false,
+      data: formData,
+      dataType: "json",
+      success: function (data) {
+        make_list(data);
+      }
+    });
+  });
+
+  $("#reset_btn").click(function(e) {
+    e.preventDefault();
+    document.getElementById("order").value = 'desc';
+    document.getElementById("option").value = 'all';
+    document.getElementById("program").value = '';
+    var formData = $('#form_search').serialize();
+    $.ajax({
+      url: '/pooq/ajax/auto_list',
+      type: "POST", 
+      cache: false,
+      data: formData,
+      dataType: "json",
+      success: function (data) {
+        make_list(data);
+      }
+    });
+  });
+
+
+
+  // pageing
+  $("body").on('click', '#page', function(e){
+    e.preventDefault();
+    var formData = $('#form_search').serialize();
+    formData += '&page=' + $(this).data('page');
+    $.ajax({
+      url: '/pooq/ajax/auto_list',
+      type: "POST", 
+      cache: false,
+      data: formData,
+      dataType: "json",
+      success: function (data) {
+        make_list(data);
+      }
+    });
+  });
+
+  // 기본에서  검색
+  $("body").on('click', '#basic_search', function(e){
+    e.preventDefault();
+    code = $(this).data('code');
+    var redirect = '/pooq/basic';
+    $.redirectPost(redirect, {code: code});
+    $(location).attr('href', '/pooq/basic?code=' + code)
+  });
+
+  $("body").on('click', '#json', function(e){
+    e.preventDefault();
+    var idx = $(this).data('idx');
+    json = current_data.data[idx].json;
+    document.getElementById("modal_title").innerHTML = "JSON";
+    document.getElementById("modal_body").innerHTML = "<pre>"+JSON.stringify(json, null, 2) + "</pre>";
+   $("#large_modal").modal();
+  });
+
+  $("body").on('click', '#program_search', function(e){
+    e.preventDefault();
+    document.getElementById("program").value = $(this).data('program');
+    var formData = $('#form_search').serialize();
+    $.ajax({
+      url: '/pooq/ajax/auto_list',
+      type: "POST", 
+      cache: false,
+      data: formData,
+      dataType: "json",
+      success: function (data) {
+        make_list(data);
+      }
+    });
+  });
+
+  $("body").on('click', '#except_program_btn', function(e){
+    e.preventDefault();
+    var program = $(this).data('program');
+    $.ajax({
+      url: '/pooq/ajax/except',
+      type: "POST", 
+      cache: false,
+      data: {program:program},
+      dataType: "json",
+      success: function (data) {
+        except_result_process(data);
+      }
+    });
+  });
+
+  $("body").on('click', '#except_channel_btn', function(e){
+    e.preventDefault();
+    var channel = $(this).data('channel');
+    $.ajax({
+      url: '/pooq/ajax/except',
+      type: "POST", 
+      cache: false,
+      data: {channel:channel},
+      dataType: "json",
+      success: function (data) {
+        except_result_process(data);
+      }
+    });
+  });
+
+
+
+});
+
+function except_result_process(data) {
+  if ( data == 1) {
+    $.notify('<strong>추가하였습니다.</strong>', {
+      type: 'success'
+    });
+  } else if ( data == 0) {
+    $.notify('<strong>이미 설정되어 있습니다.</strong>', {
+      type: 'warning'
+    });
+  } else {
+    $.notify('<strong>Exception</strong>', {
+      type: 'warning'
+    });
+  }
+}
+function make_list(ret) {
+  current_data = ret
+  //document.getElementById("modal_title").innerHTML = "Login Result";
+  //document.getElementById("modal_body").innerHTML = "<pre>"+JSON.stringify(data, null, 2) + "</pre>";
+  //$("#large_modal").modal();
+  data = ret.data;
+  str = '';
+  for (var i = 0; i < data.length; i++) {
+    str += '<hr>';
+    str += '<div class="row">';
+    str += '<div class="col-sm-3">'
+    str += '<img src="' + data[i].poster_url + '" class="img-fluid">'
+    str += '</div>';
+    str += '<div class="col-sm-9">'
+    str += '<div>';
+    str += '<strong>' + data[i].program_name + '  ' 
+    if (data[i].frequency != '') {
+      str += data[i].frequency + '회';
+    }
+    str += '</strong>';
+    str += ' (' + data[i].json.result.airDate + ')'
+    str += ' ' + data[i].channel_name
+    str += ' ' + data[i].quality_str
+    if (data[i].vod_type == 'qvod') {
+      str += ' ' + '<span style="color:red">퀵VOD</span>'
+    }
+    str += '<br><p>';
+    //if ( data.data[i].description != null)
+    //  str += '<p>' + data.data[i].description.replace('\n', '<br>') + '<p>';
+    str += '<strong>파일명</strong> : ' + data[i].filename;
+    str += '<br>'
+    
+    str += '<strong>상태</strong> : ' 
+    if (data[i].completed) {
+      str += '<span style="color:blue">다운로드 완료</span>';
+    } else if (data[i].user_abort) {
+      str += '<span style="color:red">사용자 중지</span>';
+    } else if (data[i].pf_abort) {
+      str += '<span style="color:red">PF 중지</span>';
+    } else if (data[i].etc_abort > 0) {
+      //str += '<span style="color:red">기타</span>';
+      str += '<span style="color:red">';
+      if (data[i].etc_abort == 1) {
+        str += 'FFMPEG 시작 에러';
+      } else if (data[i].etc_abort == 2) {
+        str += 'FFMPEG 시작 타임오버';
+      } else if (data[i].etc_abort == 3) {
+        str += 'FFMPEG 강제 중지';
+      } else if (data[i].etc_abort == 4) {
+        str += 'FFMPEG HTTP FORBIDDEN';
+      } else if (data[i].etc_abort == 8) {
+        str += '퀵VOD 방송중';
+      } else if (data[i].etc_abort == 9) {
+        str += 'Retry too many(20)';
+      } else if (data[i].etc_abort == 21) {
+        str += 'many retry';
+      } else if (data[i].etc_abort == 11) {
+        str += '패스 - QVOD';
+      } else if (data[i].etc_abort == 12) {
+        str += '패스 - 제외 채널';
+      } else if (data[i].etc_abort == 13) {
+        str += '패스 - 제외 프로그램';
+      }
+      str += '</span>';
+    }
+    str += '<br>';
+    if (data[i].duration != null) {
+      str += '<strong>길이</strong> : ' + duration_str(data[i].duration) + '&nbsp;&nbsp;';
+    }
+    if (data[i].filesize_str != null) {
+      str += '<strong>파일크기</strong> : ' + data[i].filesize_str+ '&nbsp;&nbsp;';;
+    }
+    if (data[i].download_speed != null) {
+      str += '<strong>다운속도</strong> : ' + data[i].download_speed+ '&nbsp;&nbsp;';;
+    }
+    str += '<br>' 
+
+    str += '</div>';
+    //str += '</pre>'
+    //str += '</div>';
+    //str += '<div class="col-sm-9">'
+    str += '<div>';
+    str += '<div class="btn-group btn-group-sm flex-wrap mr-2" role="group">';
+    str += '<button id="basic_search" name="submit" class="btn btn-sm  btn-outline-success" data-code="'+data[i].episode_code+'.' +data[i].corner_id + '">에피소드 검색</button>';
+    str += '<button id="basic_search" name="submit" class="btn btn-sm  btn-outline-success" data-code="'+data[i].program_code+ '">프로그램 검색</button>';
+    str += '<button id="json" name="submit" class="btn btn-sm  btn-outline-success" data-idx="'+i+ '">JSON</button>';
+    str += '<button id="program_search" class="btn btn-sm btn-outline-success" data-program="'+data[i].program_name+ '">목록 검색</button>';
+    str += '<button id="except_channel_btn" class="btn btn-sm btn-outline-success" data-channel="'+data[i].channel_name+ '">제외채널 추가</button>';
+    str += '<button id="except_program_btn" class="btn btn-sm btn-outline-success" data-program="'+data[i].program_name+ '">제외프로그램 추가</button>';
+    str += '</div>';
+    str += '</div>';
+    str += '</div>';
+    str += '</div>';
+  }
+  document.getElementById("list").innerHTML = str;
+ 
+  str = '<div class="d-inline-block"></div>';
+  str = '<div class="row"> \
+      <div class="col-sm-12"> \
+  <div class="btn-toolbar" style="justify-content: center;" role="toolbar" aria-label="Toolbar with button groups" > \
+  <div class="btn-group btn-group-sm mr-2" role="group" aria-label="First group">'
+  if (ret.prev_page) {
+    str += '<button id="page" data-page="' + (ret.start_page-1) + '" type="button" class="btn btn-secondary">&laquo;</button>'
+  }
+
+  for (var i = ret.start_page ; i <= ret.last_page ; i++) {
+    str += '<button id="page" data-page="' + i +'" type="button" class="btn btn-secondary" ';
+    if (i == ret.page) {
+      str += 'disabled';
+    }
+    str += '>'+i+'</button>';
+  }
+  if (ret.next_page) {
+    str += '<button id="page" data-page="' + (ret.last_page+1) + '" type="button" class="btn btn-secondary">&raquo;</button>'
+  }
+
+  str += '</div> \
+    </div> \
+    </div> \
+    </div> \
+  '
+  document.getElementById("page1").innerHTML = str;
+  document.getElementById("page2").innerHTML = str;
+}
+</script>    
+{% endblock %}

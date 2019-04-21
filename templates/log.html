@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+  <style>
+    .tab-pane {
+      border-left: 1px solid #ddd;
+      border-right: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      border-radius: 0px 0px 5px 5px;
+      padding: 10px;
+    }
+    .nav-tabs { margin-bottom: 0; }
+  </style>
+  <!--
+  <div class="page-header">
+    <h3>{{package[1]}} 로그<small></small></h3>
+  </div>
+  <hr>
+  -->
+  <nav>
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+      <a class="nav-item nav-link active"  data-toggle="tab" href="#nav-home" role="tab"  >이전</a>
+      <a class="nav-item nav-link" data-toggle="tab" href="#nav-profile" role="tab"  >실시간</a>
+    </div>
+  </nav>
+
+  <div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-home" role="tabpanel" >
+      <div>
+        <textarea id="log" class="col-md-12" rows="30" disabled style="visibility:hidden">
+        </textarea>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="nav-profile" role="tabpanel" >
+      <div>
+        <textarea id="add" class="col-md-12" rows="30" disabled style="visibility:visible">
+        </textarea>
+      </div>
+      <div class="form-check" >
+        <span>
+          <input class="form-check-input" type="checkbox" value="" id="auto_scroll" checked>
+          <label class="form-check-label" for="auto_scroll">자동 스크롤</label>
+        </span>
+        <span>
+          <button id="clear" class="btn btn-sm btn-outline-success">리셋</button>
+        </span>
+      </div>
+    </div>
+  </div>
+
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+  function ResizeTextArea() {
+    ClientHeight = window.innerHeight
+    $("#log").height(ClientHeight-240);
+    $("#add").height(ClientHeight-260);
+  }
+  $(window).resize(function() {
+    ResizeTextArea();
+  });
+  ResizeTextArea()
+})
+
+$(document).ready(function(){
+  $('#loading').show();
+  var protocol = window.location.protocol;
+  var socket = io.connect(protocol + "//" + document.domain + ":" + location.port + "/log");
+  //var socket = io.connect("http://" + document.domain + ":" + location.port + "/log", {transports:['websocket']},  {'force new connection': true});
+
+  socket.emit("start", {'package':'{{package[0]}}'} );
+  
+  socket.on('on_start', function(data){
+    document.getElementById("log").innerHTML += data.data;
+    document.getElementById("log").scrollTop = document.getElementById("log").scrollHeight;
+    document.getElementById("log").style.visibility = 'visible';
+  });
+
+  socket.on('add', function(data){
+    if (data.package == "{{package[0]}}") {
+      var chk = $('#auto_scroll').is(":checked");
+      document.getElementById("add").innerHTML += data.data;
+      if (chk) document.getElementById("add").scrollTop = document.getElementById("add").scrollHeight;
+    }
+  });
+
+  $("#clear").click(function(e) {
+    e.preventDefault(); 
+    document.getElementById("add").innerHTML = '';
+  });
+
+  $("#auto_scroll").click(function(){
+    var chk = $(this).is(":checked");//.attr('checked');
+  });
+});
+</script>    
+{% endblock %}
