@@ -51,6 +51,7 @@ if __name__ == '__main__':
     try:
         #import multiprocessing
         #multiprocessing.set_start_method('spawn')
+        print sys.argv
         port = None
         if len(sys.argv) > 1:
             port = int(sys.argv[1])
