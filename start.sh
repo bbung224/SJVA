@@ -1,6 +1,5 @@
 #! /bin/sh
 COUNT=0
-
 while [ 1 ];
 do
     git reset --hard
@@ -19,7 +18,7 @@ do
     fi
     python -OO sjva.py 9999 ${COUNT}
     RESULT=$?
-    echo "PYTHON  EXIT CODE : ${RESULT}.............."
+    echo "PYTHON EXIT CODE : ${RESULT}.............."
     if [ "$RESULT" = "1" ] || [ "$RESULT" = "2" ]; then
         echo 'REPEAT....'
     else
