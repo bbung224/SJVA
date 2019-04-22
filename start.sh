@@ -8,6 +8,9 @@ do
     if [ -f "$FILENAME" ] ; then
         pip install -r update_requirements.txt
     fi
+    export FLASK_APP=sjva.py
+    flask db migrate
+    flask db upgrade
     python -OO sjva.py 9999 ${COUNT}
     RESULT=$?
     echo "EXIT CODE : ${RESULT}.............."

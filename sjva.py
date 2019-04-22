@@ -29,16 +29,9 @@ except:
 # update:1
 # restart:2
 
-def start_app(port=None):
-    if port is None: 
-        try :
-            entity = framework.db.session.query(system.model.ModelSetting).filter_by(key='port').first()
-            if entity is not None:
-                port = int(entity.value)
-        except:
-            print 'port is none.'
+def start_app():
     try:
-        framework.socketio.run(app, host='0.0.0.0', port=port)
+        framework.socketio.run(app, host='0.0.0.0', port=app.config['config']['port'])
         print 'EXIT CODE : %s' % framework.exit_code
         if framework.exit_code != -1:
             sys.exit(framework.exit_code)
@@ -49,20 +42,7 @@ def start_app(port=None):
 
 if __name__ == '__main__':
     try:
-        #import multiprocessing
-        #multiprocessing.set_start_method('spawn')
-        print sys.argv
-        port = None
-        if len(sys.argv) > 1:
-            port = int(sys.argv[1])
-
-        start_app(port)
-        #, async_mode='greenlet')
-        #app.run(host='0.0.0.0', port=9997, debug=False)
-        #from gevent.pywsgi import WSGIServer
-        #print 'WSGIServer start..'
-        #http = WSGIServer(('0.0.0.0', 9997), app.wsgi_app)
-        #http.serve_forever()
+        start_app()
     except Exception as e:
         print e
         
