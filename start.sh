@@ -2,24 +2,24 @@
 COUNT=0
 while [ 1 ];
 do
-    git reset --hard
+    git reset --hard HEAD
     git pull
     FILENAME="update_requirements.txt"
     if [ -f "$FILENAME" ] ; then
         pip install -r update_requirements.txt
     fi
     export FLASK_APP=sjva.py
-    if [ ! -d "/app/migrations" ] && [ -f "/app/data/db/site.db" ]; then
+    if [[ ! -d "./migrations" ] && [ -f "./data/db/site.db" ]]; then
         python -OO -m flask db init
     fi
-    if [ -d "/app/migrations" ]; then
+    if [ -d "./migrations" ]; then
         python -OO -m flask db migrate
         python -OO -m flask db upgrade
     fi
-    python -OO sjva.py 9999 ${COUNT}
+    python -OO sjva.py 0 ${COUNT}
     RESULT=$?
     echo "PYTHON EXIT CODE : ${RESULT}.............."
-    if [ "$RESULT" = "1" ] || [ "$RESULT" = "2" ]; then
+    if [[ "$RESULT" = "1" ] || [ "$RESULT" = "2" ]]; then
         echo 'REPEAT....'
     else
         echo 'FINISH....'
