@@ -3,14 +3,15 @@ COUNT=0
 
 while [ 1 ];
 do
+    git reset --hard
     git pull
     FILENAME="update_requirements.txt"
     if [ -f "$FILENAME" ] ; then
         pip install -r update_requirements.txt
     fi
     export FLASK_APP=sjva.py
-    flask db migrate
-    flask db upgrade
+    python -OO -m flask db migrate
+    python -OO -m flask db upgrade
     python -OO sjva.py 9999 ${COUNT}
     RESULT=$?
     echo "EXIT CODE : ${RESULT}.............."
