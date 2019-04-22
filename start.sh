@@ -10,6 +10,9 @@ do
         pip install -r update_requirements.txt
     fi
     export FLASK_APP=sjva.py
+    if [ ! -d "/app/migrations" ] && [ -f "/app/data/db/site.db" ]; then
+        python -OO -m flask db init
+    fi
     python -OO -m flask db migrate
     python -OO -m flask db upgrade
     python -OO sjva.py 9999 ${COUNT}
