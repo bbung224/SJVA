@@ -7,8 +7,6 @@ set COUNT=0
     git reset --hard HEAD
     git pull
     set FILENAME=.\update_requirements.txt
-    rem set FILENAME=.\sjva.py
-    rem if exist %FILENAME% notepad %FILENAME%
     if exist %FILENAME% (
         pip install -r %FILENAME%
     )

@@ -10,7 +10,7 @@
     {{ macros.m_tab_head_end() }}
   </nav>
   <div class="tab-content" id="nav-tabContent">
-    <!-- 일반 -->
+    <!-- Remotes -->
     {{ macros.m_tab_content_start('Remotes', true) }}
       {{ macros.setting_input_text_and_buttons('path_rclone', 'RCLONE Path', [['rclone_path_test_btn', '버전확인'], ['rclone_config_btn', 'Config']], value=arg['path_rclone'], disabled=True) }}
       {{ macros.m_hr_black() }}
@@ -24,6 +24,7 @@
       <div id="remotes_list_div"></div>
     {{ macros.m_tab_content_end() }}
 
+     <!-- 작업 -->
     {{ macros.m_tab_content_start('작업', false) }}
       {{ macros.m_row_start() }}  
       {{ macros.m_button('job_add_btn', '작업 추가') }}
@@ -53,24 +54,34 @@
 
         {{ macros.setting_button([['setting_save_btn', '저장']]) }}
       </form>
+      {{ macros.m_hr_black() }}
+      <div id="job_list_div"></div>
     {{ macros.m_tab_content_end() }}
 
   </div><!--tab-content-->
 </div> <!--전체-->
 
-
+<!-- 작업추가 모달 -->
 {{ macros.m_modal_start('job_add_modal', '작업 추가', 'modal-lg') }}
-  {{ macros.setting_radio('job_type', '타입', ['사용자', '자동(타 플러그인)'])}}
-  {{ macros.setting_select('job_command', 'Command', [['move', 'Move'],['copy', 'Copy'],['sync', 'Sync']], col='3', desc='Rclone 명령어')}}
-  {{ macros.setting_select('job_remote', 'Remote', [], col='3')}}
+  <form id='job_setting'>
+  {{ macros.setting_radio('job_type', '타입', ['사용자', '자동(타 플러그인)']) }}
+  {{ macros.setting_input_text('job_name', 'Name', desc='목록 검색에서 사용할 이름. 없을시 ID') }}
+  {{ macros.setting_select('job_command', 'Command', [['move', 'Move'],['copy', 'Copy'],['sync', 'Sync']], col='6', desc='Rclone 명령어')}}
+  {{ macros.setting_input_text('job_local_path', 'Local Path') }}
+  {{ macros.setting_select('job_remote', 'Remote', [], col='6')}}
+  {{ macros.setting_input_text_and_buttons('job_remote_path', 'Remote Path', [['job_ls_btn', '폴더확인'], ['job_ls_close_btn', 'Toggle']], value='/') }}
+
+  {{ macros.setting_top(padding='0') }}
+  <div id="ls_div" class="collapse" style="padding-left:20px;"></div>
+  {{ macros.setting_bottom(padding_top='0') }}
   
+
+  {{ macros.setting_input_text('job_option_static', '고정 옵션') }}
+  {{ macros.setting_input_text('job_option_user', '옵션') }}
+  {{ macros.setting_button([['job_save_btn', '저장'], ['job_remove_btn', '삭제']]) }}
+  </form>
 {{ macros.m_modal_end() }}
-
-
-    
-
-
-
+<!-- END 작업추가 모달 -->
 
 
 <script type="text/javascript">
@@ -78,7 +89,14 @@ var current_data = null;
 
 $(document).ready(function(){
   var package_name = 'rclone';
+  
+  $('#job_ls_btn').attr("data-target", "#ls_div");
+  $('#job_ls_close_btn').attr("data-target", "#ls_div");
+  $('#job_option_static').attr("readonly", "true");
 
+  
+
+  // 페이지 로딩
   $.ajax({
     url: '/' + package_name + '/ajax/load_remotes',
     type: "POST", 
@@ -87,10 +105,8 @@ $(document).ready(function(){
     dataType: "json",
     success: function (data) {
       current_data = data;
-      //document.getElementById("modal_title").innerHTML = "ffmpeg -version";
-      //document.getElementById("modal_body").innerHTML = "<pre>"+JSON.stringify(data, null, 2) + "</pre>";
-      //$("#large_modal").modal();
       make_remotes_list(data.remotes);
+      make_job_list(data.remotes);
     }
   });
 
@@ -115,13 +131,9 @@ $(document).ready(function(){
     });
   });
 
-  // rclone config 버튼
+  // config 버튼
   $("body").on('click', '#rclone_config_btn', function(e){
     e.preventDefault();
-    //command = path_rclone + ' --config ' + path_config + ' ' + document.getElementById("command").value;
-    //redirect = '/command/api/command'
-    //$.redirectPost(redirect, {command: command});
-    //command = document.getElementById("command").value;
     command = 'config';
     $.ajax({
       url: '/' + package_name + '/ajax/send_to_command_plugin',
@@ -130,7 +142,6 @@ $(document).ready(function(){
       data:{command:command},
       dataType: "json",
       success: function (data) {
-        //document.getElementById("process_command").value = '';
         redirect = '/command/api/command'
         $.redirectPost(redirect, {command: data});
       }
@@ -141,16 +152,84 @@ $(document).ready(function(){
   // 작업추가 버튼
   $("body").on('click', '#job_add_btn', function(e){
     e.preventDefault();
+    $('input[name=job_type]')[0].checked = true;
+    $('#job_save_btn').attr("data-id", "-1");
+    var str = '';
+    for (i in current_data.remotes) {
+      str += '<option value="'+current_data.remotes[i].name+'">'+current_data.remotes[i].name+'</option>'
+    }
+    tmp = document.querySelectorAll('[id^="job_type"]')
+    console.log(tmp)
+    for (i in tmp)
+      tmp[i].disabled = true;
+    document.getElementById('job_remote').innerHTML = str;
+    document.getElementById('job_remove_btn').disabled = true;    
     $("#job_add_modal").modal();
-    
+  }); 
+
+  // ls 버튼
+  $("body").on('click', '#job_ls_btn', function(e){
+    e.preventDefault();
+    remote = document.getElementById('job_remote').value;
+    remote_path = document.getElementById('job_remote_path').value;
+    $.ajax({
+      url: '/' + package_name + '/ajax/remote_ls',
+      type: "POST", 
+      cache: false,
+      data:{remote:remote, remote_path, remote_path},
+      dataType: "json",
+      success: function (data) {
+        $('.collapse').collapse('show')
+        document.getElementById('ls_div').innerHTML = "<pre>"+JSON.stringify(data, null, 2) + "</pre>";
+      }
+    });
+  }); 
+  
+  // ls 토글 버튼
+  $("body").on('click', '#job_ls_close_btn', function(e){
+    e.preventDefault();
+    //$('#ls_div').collapse('hide');
+    $('#ls_div').collapse('toggle');
+  }); 
+  
+  // 작업 저장 버튼
+  $("body").on('click', '#job_save_btn', function(e) {
+    e.preventDefault();
+    id = $('#job_save_btn').data('id')
+    var formData = get_formdata('#job_setting');
+    formData += '&id=' + id;
+    formData += '&job_type='
+    if ( $('input[name=job_type]')[0].checked ) {
+      formData += '0'
+    } else {
+      formData += '1'
+    }
+    console.log(formData);
+    $.ajax({
+      url: '/' + package_name + '/ajax/job_save',
+      type: "POST", 
+      cache: false,
+      data:formData,
+      success: function (data) {
+        current_data = data;
+        make_remotes_list(data.remotes);
+        make_job_list(data.remotes);
+        if (data.ret == 'success')  {
+          $.notify('<strong>설정을 저장하였습니다.</strong>', {
+	          type: 'success'
+          });
+        } else {
+          $.notify('<strong>저장 실패</strong>', {
+            type: 'warning'
+          });
+        }
+        $("#job_add_modal").modal('hide');
+      }
+    });
   });
 
 
-
   
-
-
-
 
 
 
@@ -179,6 +258,28 @@ function make_remotes_list(data) {
   document.getElementById("remotes_list_div").innerHTML = str;
 }
 
+function make_job_list(data) {
+  str = ''
+  for (i in data) {
+    str += m_row_start_top();
+    str += m_col(1, (parseInt(i)+1), 'center');
+    str += m_col(2, data[i].name, 'center');
+    str += m_col(1, data[i].type, 'center');
+    tmp = ''
+    for (key in data[i]) {
+      tmp += m_row_start(padding="0");
+      if (key != 'type') {
+        tmp += m_col(3, key, align='right');
+        tmp += m_col(9, data[i][key]);
+      }
+      tmp += m_row_end();
+    }
+    str += m_col(8, tmp);
+    str += m_row_end();
+    str += m_hr();
+  }
+  document.getElementById("job_list_div").innerHTML = str;
+}
 
   
   

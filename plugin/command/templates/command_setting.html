@@ -235,7 +235,7 @@ $(document).ready(function(){
     e.preventDefault();
     command = document.getElementById("process_command").value;
     $.ajax({
-      url: '/' + package_name + '/ajax/send_to_rclone_process',
+      url: '/' + package_name + '/ajax/send_process_command',
       type: "POST", 
       cache: false,
       data:{command:command},
@@ -354,14 +354,14 @@ $(document).ready(function(){
       return
     }
     var formData = get_formdata('#item_setting');
-    console.log(formData);
+    //console.log(formData);
     $.ajax({
       url: '/' + package_name + '/ajax/item_save',
       type: "POST", 
       cache: false,
       data:formData,
       success: function (data) {
-        console.log(data)
+        //console.log(data)
         if (data.ret == 'success')  {
           $.notify('<strong>설정을 저장하였습니다.</strong>', {
 	          type: 'success'

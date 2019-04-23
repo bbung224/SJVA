@@ -87,12 +87,15 @@
         <script type="text/javascript" language="javascript">
           $(document).ready(function(){
             $('#loading').hide();
+            $('#modal_loading').hide();
           })
           .ajaxStart(function(){
             $('#loading').show();
+            $('#modal_loading').show();
           })
           .ajaxStop(function(){
             $('#loading').hide();
+            $('#modal_loading').hide();
           });
           
         </script> 
@@ -133,9 +136,7 @@
         </div>
       <!-- Modal end -->
 
-      <div class="loading" id="loading">
-        <img src="/static/img/loading.gif" />
-      </div>
+      
       {{ menu() }}
       
       <!--<nav class="navbar " role="navigation"> width가 메뉴만큼-->
@@ -147,6 +148,9 @@
           {% block content %}{% endblock %}
         </div>
       </main>
+      <div class="loading" id="loading">
+        <img src="/static/img/loading.gif" />
+      </div>
     </body>
 </html>
 
@@ -227,5 +231,6 @@ function m_tab_content(name, content, active) {
   str += '</div>'
   return str;
 }
+
 
 </script>
