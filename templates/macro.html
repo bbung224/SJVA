@@ -168,6 +168,26 @@
 {% endmacro %}
 
 
+{% macro setting_input_textarea(id, left, value='', col='9', row='3', desc='', disabled=False) %}
+  {{ setting_top(left) }}
+  <div class="input-group col-sm-{{col}}">
+    <textarea id="{{id}}" name="{{id}}" class="col-md-12" rows="{{row}}" 
+      {% if disabled %}
+        disabled
+      {% endif %}
+    >{{ value }}
+    </textarea>
+  </div>  
+  {{ setting_bottom(desc) }}
+  
+{% endmacro %}
+
+
+
+
+
+
+
 
 
 {% macro m_row_start(padding='10', align='center') %}

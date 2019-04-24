@@ -10,25 +10,20 @@
   {{ macros.info_text('version', 'SJVA 버전') }}
   {{ macros.info_text('path_app_root', 'SJVA 폴더') }}
   {{ macros.info_text('running_type', '실행타입') }}
-  
   <div class="d-inline-block"></div>
+
   <h3>모니터링</h3>
   <hr>
   {{ macros.info_text('time', '시간') }}
   {{ macros.info_text('cpu_percent', 'CPU 사용량') }}
   {{ macros.info_text('memory', '메모리') }}
   {{ macros.info_text('disk', '디스크') }}
-
-  <div id="monitering_div">
-    {{ macros.m_button('celery_test', 'celery_test') }}
-  </div>
-
   <div class="d-inline-block"></div>
+
   <h3>스케쥴러</h3>
   <hr>
   <div id="scheduler_list_div"></div>
 </div> <!--전체-->
-
 
 
 <script type="text/javascript">
@@ -38,7 +33,8 @@ function make_scheduler_list(data) {
   str = m_row_start(p='0');
   str += m_col(1, '<strong>NO</strong>', align='center');
   str += m_col(2, '<strong>플러그인 & ID</strong>');
-  str += m_col(2, '<strong>생성 & 다음 실행</strong>');
+  //str += m_col(2, '<strong>생성 & 다음 실행</strong>');
+  str += m_col(2, '<strong>다음 실행 (남은시간)</strong>');
   str += m_col(1, '<strong>이전소요</strong>');
   str += m_col(1, '<strong>주기</strong>');
   str += m_col(1, '<strong>횟수</strong>');
@@ -53,8 +49,9 @@ function make_scheduler_list(data) {
     tmp = '<strong>'+data[i].plugin+' - </strong>' + data[i].id + '<br>';
     str += m_col(2, tmp);
 
-    tmp = ''+''+'' + data[i].make_time + '<br>';
-    tmp += ''+''+'' + data[i].next_run_time + '<br>';
+    //tmp = ''+''+'' + data[i].make_time + '<br>';
+    //tmp += ''+''+'' + data[i].next_run_time + '<br>';
+    tmp = ''+''+'' + data[i].next_run_time + ' ('+data[i].remain_time+'초)';
     str += m_col(2, tmp);
     tmp = ''+''+'' + data[i].running_timedelta + ' 초<br>';
     str += m_col(1, tmp);
@@ -96,23 +93,6 @@ $(document).ready(function(){
     }
     make_scheduler_list(data.scheduler);
   });
-
-
-  $("body").on('click', '#celery_test', function(e){
-    e.preventDefault();
-    $.ajax({
-      url: '/system/ajax/celery_test',
-      type: "POST", 
-      cache: false,
-      data:{},
-      dataType: "json",
-      success: function (data) {
-        m_modal(data)
-      }
-    });
-  });
-
-
 });
 
   

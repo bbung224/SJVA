@@ -74,6 +74,7 @@ $(document).ready(function(){
     document.getElementById("log").innerHTML += data.data;
     document.getElementById("log").scrollTop = document.getElementById("log").scrollHeight;
     document.getElementById("log").style.visibility = 'visible';
+    $('#loading').hide();
   });
 
   socket.on('add', function(data){
