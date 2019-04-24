@@ -79,6 +79,7 @@
 
   {{ macros.setting_input_textarea('job_option_static', '고정 옵션', value=arg['default_rclone_setting']['static']) }}
   {{ macros.setting_input_textarea('job_option_user', '옵션') }}
+  {{ macros.setting_checkbox('is_scheduling', '스케쥴링 여부', desc=['On : 스케쥴링 작업에 포함', 'Off : 수동으로 실행']) }}
 
   {{ macros.setting_button([['job_save_btn', '저장'], ['job_remove_btn', '삭제']]) }}
   </form>
