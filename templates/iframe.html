@@ -3,11 +3,13 @@
 
 <div class="row" style="align-items: center; text-align: center;">
   
-      <iframe id="iframe" class="embed-responsive"  src="{{site}}" frameborder="0" scrolling="no" allowfullscreen></iframe>
-  
+      <iframe id="iframe" class="embed-responsive"  src="{{site}}" frameborder="0" scrolling="yes" allowfullscreen></iframe>
+  <a href="{{site}}" target="_blank">새창으로 열기</a>
 </div>
 
 <script type="text/javascript">
+  var protocol = window.location.protocol;
+  console.log(protocol)
   $(document).ready(function() {
     function Resize() {
       ClientHeight = window.innerHeight
