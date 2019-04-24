@@ -4,13 +4,27 @@
 <div class="row" style="align-items: center; text-align: center;">
   
       <iframe id="iframe" class="embed-responsive"  src="{{site}}" frameborder="0" scrolling="yes" allowfullscreen></iframe>
-  <a href="{{site}}" target="_blank">새창으로 열기</a>
+  <a id='link' href="{{site}}" target="_blank">새창으로 열기</a>
 </div>
 
 <script type="text/javascript">
-  var protocol = window.location.protocol;
-  console.log(protocol)
+
+
+
+
   $(document).ready(function() {
+    var protocol = window.location.protocol;
+    console.log(protocol)
+    tmp = $('#iframe').attr('src')
+    if (tmp.search('flaskfilemanager') != -1) {
+      if (protocol == 'https:')  {
+        tmp = tmp.replace('http:', 'https:')
+        $('#iframe').attr('src', tmp)
+        $('#link').attr('href', tmp)
+      }
+    }
+
+
     function Resize() {
       ClientHeight = window.innerHeight
       $("#iframe").height(ClientHeight-150);
