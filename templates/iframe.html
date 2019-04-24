@@ -17,8 +17,8 @@
     var protocol = window.location.protocol;
     console.log(protocol)
     tmp = url
-    $('#iframe').attr('src', tmp)
-    $('#link').attr('href', tmp)
+    //$('#iframe').attr('src', tmp)
+    //$('#link').attr('href', tmp)
     if (tmp.search('flaskfilemanager') != -1) {
       if (protocol == 'https:' && tmp.search('http:') != -1)  {
         tmp = tmp.replace('http:', 'https:')
