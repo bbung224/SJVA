@@ -82,7 +82,7 @@
   {{ macros.setting_input_textarea('job_option_static', '고정 옵션', value=arg['default_rclone_setting']['static']) }}
   {{ macros.setting_input_textarea('job_option_user', '옵션') }}
   
-  {{ macros.setting_default_checkbox('is_scheduling', '스케쥴링 여부', '스케쥴링 작업에 포함할 경우 체크', 'true') }}
+  {{ macros.setting_checkbox('is_scheduling', '스케쥴링 여부', 'true', desc='스케쥴링 작업에 포함할 경우 체크') }}
 
   {{ macros.setting_button([['job_save_btn', '저장'], ['job_remove_btn', '삭제']]) }}
 
@@ -174,6 +174,7 @@ $(document).ready(function(){
       tmp[i].disabled = true;
     document.getElementById('job_remote').innerHTML = str;
     document.getElementById('job_remove_btn').disabled = true; 
+    document.getElementById('job_save_btn').disabled = false;
     document.getElementById('job_add_modal_title').innerHTML = "작업 추가"   
     $("#job_add_modal").modal();
   }); 
@@ -215,7 +216,16 @@ $(document).ready(function(){
     document.getElementById('job_remote_path').value = select_job.remote_path;
     document.getElementById('job_option_static').value = select_job.option_static;
     document.getElementById('job_option_user').value = select_job.option_user;
-    document.getElementById('is_scheduling').checked = select_job.is_scheduling;
+    //is_scheduling
+    
+    if (select_job.is_scheduling) {
+      //document.getElementById("item_auto_start").value = 'on';
+      $('#is_scheduling').bootstrapToggle('on')
+    } else {
+      $('#is_scheduling').bootstrapToggle('off')
+    }
+
+    //document.getElementById('is_scheduling').checked = select_job.is_scheduling;
     document.getElementById('job_remove_btn').disabled = false;  
     document.getElementById('job_add_modal_title').innerHTML = "작업 수정"
     if (select_job.job_type != 0) {

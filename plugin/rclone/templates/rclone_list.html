@@ -115,7 +115,7 @@ function make_job_select(data) {
     if (data[i].name == '') {
       str += "ID:" + data[i].id
     } else {
-      str += 'Name:' + data[i].name + " ID:" + data[i].id
+      str += '' + data[i].name;// + " ID:" + data[i].id
     }
     str += "</option>"
   }

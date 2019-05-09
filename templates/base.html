@@ -86,16 +86,16 @@
         -->
         <script type="text/javascript" language="javascript">
           $(document).ready(function(){
-            $('#loading').hide();
-            $('#modal_loading').hide();
+            $('.loading').hide();
+            //$('#modal_loading').hide();
           })
           .ajaxStart(function(){
-            $('#loading').show();
-            $('#modal_loading').show();
+            $('.loading').show();
+            //$('#modal_loading').show();
           })
           .ajaxStop(function(){
-            $('#loading').hide();
-            $('#modal_loading').hide();
+            $('.loading').hide();
+            //$('#modal_loading').hide();
           });
           
         </script> 
