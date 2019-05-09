@@ -1,19 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
-
-{% if sub == 'auto' %}
-  
+ 
 <div>
-  <nav>  
-    <div class="nav nav-tabs" id="nav-tab" role="tablist">
-      <a class="nav-item nav-link active" id="nav-list-tab" data-toggle="tab" href="#nav-list" role="tab" aria-controls="nav-list" aria-selected="true">목록</a>
-      <a class="nav-item nav-link" id="nav-setting-tab" data-toggle="tab" href="#nav-setting" role="tab" aria-controls="nav-setting" aria-selected="false">설정</a>
-    </div>
+  <nav>
+    {{ macros.m_tab_head_start() }}
+      {{ macros.m_tab_head('설정', false) }}
+      {{ macros.m_tab_head('목록', true) }}
+    {{ macros.m_tab_head_end() }}
   </nav>
 
   <div class="tab-content" id="nav-tabContent">
-    <div class="tab-pane fade show active" id="nav-list" role="tabpanel" aria-labelledby="nav-list-tab">
-
+    {{ macros.m_tab_content_start('목록', true) }}
     <form id="form_search" class="form-inline" style="text-align:left">
       <div class="container-fluid">
         <div class="row show-grid">
@@ -45,69 +42,25 @@
     <div id='page1'></div>
     <div id="list"></div>
     <div id='page2'></div>
-  </div> <!--tab-->
+   {{ macros.m_tab_content_end() }}
       
-
-  <div class="tab-pane fade" id="nav-setting" role="tabpanel" aria-labelledby="nav-setting-tab">
-    
-    {{ macros.setting_top('스케쥴링 작동') }}
-      <div class="input-group col-sm-3">
-        {% if arg['scheduler'] == 'True' %}
-        <input id="scheduler" name="scheduler" class="form-control form-control-sm" type="checkbox" data-toggle="toggle" checked>
-          
-        {% else %}
-        <input id="scheduler" name="scheduler" class="form-control form-control-sm" type="checkbox" data-toggle="toggle">
-        {% endif %}
-        {% if arg['is_running'] == 'True' %}
-          <span style="padding-left:10px; padding-top: 8px;">동작중</span>
-        {% else %}    
-          {% if arg['scheduler'] == 'True' %}
-            <span style="padding-left:10px; padding-top: 8px;">대기중</span>
-          {% endif %}  
-        {% endif %}    
-      </div>
-    {{ macros.setting_bottom(['On : 스케쥴링 시작','Off : 스케쥴링 중지']) }}
-
+   {{ macros.m_tab_content_start('설정', false) }}
+    {{ macros.setting_scheduler_button(arg['scheduler'], arg['is_running']) }}
     <form id='setting' name='setting'>
-    {{ macros.setting_input_int('auto_interval', '스케쥴링 실행 주기', value=arg['auto_interval'], min='1', placeholder='10', desc='minute 단위') }}
-
-    {{ macros.setting_checkbox('auto_start', '시작시 자동실행', value=arg['auto_start'], desc='On : 시작시 자동으로 스케쥴러에 등록됩니다.') }}
-    
-    {{ macros.setting_input_text('auto_save_path', '저장 폴더', value=arg['auto_save_path'], desc='정상적으로 완료된 파일이 이동할 폴더 입니다. ') }}
-    
-    {{ macros.setting_top('기본 화질') }}
-        <div class="input-group col-sm-3">
-          <select id="auto_quality" name="auto_quality" class="form-control form-control-sm" value="{{arg['quality']}}"> 
-            <option value="FHD">FHD</option>
-            <option value="HD">HD</option>
-            <option value="SD">SD</option>
-          </select>
-        </div>
-    {{ macros.setting_bottom() }}
-
-    {{ macros.setting_input_int('auto_page', '탐색 페이지수', value=arg['auto_page'], min='1', placeholder='2') }}
-
-    {{ macros.setting_checkbox('retry_user_abort', '사용자 중지 항목 다시 받기', value=arg['retry_user_abort'], desc='On : 다음 스케쥴링 때 다시 받습니다.') }}
-
-    {{ macros.setting_checkbox('qvod_download', 'Quick VOD 받기', value=arg['qvod_download']) }}
-
-    {{ macros.setting_input_text('except_channel', '제외 채널', value=arg['except_channel'], desc=[',로 구분', '채널 이름과 일치하면 제외합니다.']) }}
-    
-    {{ macros.setting_input_text('except_program', '제외 프로그램', value=arg['except_program'], desc=[',로 구분', '이 곳에 있는 항목이 프로그램에 이름에 포함되어 있으면 제외합니다.']) }}
-
-    {{ macros.setting_input_text('download_program_in_qvod', 'Quick VOD 중 다운받을 프로그램', value=arg['download_program_in_qvod'], desc=[',로 구분', 'Quick VOD 받기가 Off 일때, 다운받을 프로그램 이름', 'Quick VOD가 On일 경우에는 이 설정과 상관없이 모두 다운']) }}
-
-    {{ macros.setting_top() }}
-        <div class="col-sm-6 text-left">
-          <button id="setting_save" name="submit" class="btn btn-outline-success">저장</button>
-        </div>
-    {{ macros.setting_bottom() }}
+      {{ macros.setting_input_int('auto_interval', '스케쥴링 실행 주기', value=arg['auto_interval'], min='1', placeholder='10', desc='minute 단위') }}
+      {{ macros.setting_checkbox('auto_start', '시작시 자동실행', value=arg['auto_start'], desc='On : 시작시 자동으로 스케쥴러에 등록됩니다.') }}
+      {{ macros.setting_input_text('auto_save_path', '저장 폴더', value=arg['auto_save_path'], desc='정상적으로 완료된 파일이 이동할 폴더 입니다. ') }}
+      {{ macros.setting_select('auto_quality', '기본 화질', [['FHD', 'FHD'], ['HD', 'HD'], ['SD', 'SD']], col='3', value=arg['quality']) }}
+      {{ macros.setting_input_int('auto_page', '탐색 페이지수', value=arg['auto_page'], min='1', placeholder='2') }}
+      {{ macros.setting_checkbox('retry_user_abort', '사용자 중지 항목 다시 받기', value=arg['retry_user_abort'], desc='On : 다음 스케쥴링 때 다시 받습니다.') }}
+      {{ macros.setting_checkbox('qvod_download', 'Quick VOD 받기', value=arg['qvod_download']) }}
+      {{ macros.setting_input_text('except_channel', '제외 채널', value=arg['except_channel'], desc=[',로 구분', '채널 이름과 일치하면 제외합니다.']) }}
+      {{ macros.setting_input_text('except_program', '제외 프로그램', value=arg['except_program'], desc=[',로 구분', '이 곳에 있는 항목이 프로그램에 이름에 포함되어 있으면 제외합니다.']) }}
+      {{ macros.setting_input_text('download_program_in_qvod', 'Quick VOD 중 다운받을 프로그램', value=arg['download_program_in_qvod'], desc=[',로 구분', 'Quick VOD 받기가 Off 일때, 다운받을 프로그램 이름', 'Quick VOD가 On일 경우에는 이 설정과 상관없이 모두 다운']) }}
+      {{ macros.setting_button([['setting_save', '저장']]) }}
     </form>
-
-  </div> <!--탭-->
+    {{ macros.m_tab_content_end() }}
 </div>
-
-{% endif %} 
 
 <script type="text/javascript">
 var current_data = null;
@@ -247,7 +200,7 @@ $(document).ready(function(){
   $("body").on('click', '#json', function(e){
     e.preventDefault();
     var idx = $(this).data('idx');
-    json = current_data.data[idx].json;
+    json = current_data.list[idx].json;
     document.getElementById("modal_title").innerHTML = "JSON";
     document.getElementById("modal_body").innerHTML = "<pre>"+JSON.stringify(json, null, 2) + "</pre>";
    $("#large_modal").modal();
@@ -320,10 +273,11 @@ function except_result_process(data) {
 }
 function make_list(ret) {
   current_data = ret
+  window.scrollTo(0,0);
   //document.getElementById("modal_title").innerHTML = "Login Result";
   //document.getElementById("modal_body").innerHTML = "<pre>"+JSON.stringify(data, null, 2) + "</pre>";
   //$("#large_modal").modal();
-  data = ret.data;
+  data = ret.list;
   str = '';
   for (var i = 0; i < data.length; i++) {
     str += '<hr>';
@@ -394,6 +348,9 @@ function make_list(ret) {
       str += '<strong>다운속도</strong> : ' + data[i].download_speed+ '&nbsp;&nbsp;';;
     }
     str += '<br>' 
+    if (data[i].end_time != '') {
+      str += '<strong>완료시간</strong> : ' + data[i].end_time + ' (' + data[i].download_time+'초)'
+    }
 
     str += '</div>';
     //str += '</pre>'
@@ -414,33 +371,7 @@ function make_list(ret) {
   }
   document.getElementById("list").innerHTML = str;
  
-  str = '<div class="d-inline-block"></div>';
-  str = '<div class="row"> \
-      <div class="col-sm-12"> \
-  <div class="btn-toolbar" style="justify-content: center;" role="toolbar" aria-label="Toolbar with button groups" > \
-  <div class="btn-group btn-group-sm mr-2" role="group" aria-label="First group">'
-  if (ret.prev_page) {
-    str += '<button id="page" data-page="' + (ret.start_page-1) + '" type="button" class="btn btn-secondary">&laquo;</button>'
-  }
-
-  for (var i = ret.start_page ; i <= ret.last_page ; i++) {
-    str += '<button id="page" data-page="' + i +'" type="button" class="btn btn-secondary" ';
-    if (i == ret.page) {
-      str += 'disabled';
-    }
-    str += '>'+i+'</button>';
-  }
-  if (ret.next_page) {
-    str += '<button id="page" data-page="' + (ret.last_page+1) + '" type="button" class="btn btn-secondary">&raquo;</button>'
-  }
-
-  str += '</div> \
-    </div> \
-    </div> \
-    </div> \
-  '
-  document.getElementById("page1").innerHTML = str;
-  document.getElementById("page2").innerHTML = str;
+  make_page_html(ret.paging);
 }
 </script>    
 {% endblock %}

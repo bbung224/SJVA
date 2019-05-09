@@ -1,74 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
 
-{% if sub == 'basic' %}
 <div>
-  <nav>  
-    <div class="nav nav-tabs" id="nav-tab" role="tablist">
-      <a class="nav-item nav-link active" id="nav-donwload-tab" data-toggle="tab" href="#nav-donwload" role="tab" aria-controls="nav-donwload" aria-selected="true">다운로드</a>
-      <!--<a class="nav-item nav-link" id="nav-list-tab" data-toggle="tab" href="#nav-list" role="tab" aria-controls="nav-list" aria-selected="false">목록</a>-->
-      <a class="nav-item nav-link" id="nav-setting-tab" data-toggle="tab" href="#nav-setting" role="tab" aria-controls="nav-setting" aria-selected="false">설정</a>
-    </div>
+  <nav> 
+    {{ macros.m_tab_head_start() }}
+      {{ macros.m_tab_head('설정', false) }}
+      {{ macros.m_tab_head('다운로드', true) }}
+    {{ macros.m_tab_head_end() }}
   </nav>  
 
   <div class="tab-content" id="nav-tabContent">
-    <div class="tab-pane fade show active" id="nav-donwload" role="tabpanel" aria-labelledby="nav-donwload-tab">
+    {{ macros.m_tab_content_start('다운로드', true) }}
       <form>
-        {{ macros.setting_top('URL or Code') }}
-          <div class="input-group col-sm-9">
-            <input id="url" type="text" class="form-control" placeholder="URL or Code" >
-            <span class='text-left' style="padding-left:10px; padding-top:3px">
-              <button id="analyze" name="submit" class="btn btn-sm btn-outline-success">분석</button>
-              <button id="go_pooq" class="btn btn-sm btn-outline-success">푹</button>
-            </span>
-          </div>
-        {{ macros.setting_bottom('URL & Program Code & Episode Code & Movie Code') }}
+        {{ macros.setting_input_text_and_buttons('url', 'URL or Code', [['analyze', '분석'], ['go_pooq', '푹']], desc='URL & Program Code & Episode Code & Movie Code') }}
       </form>
       <div id='detail'></div>
       <div id="more"></div>
-    </div> <!--tab-pane-->
+    {{ macros.m_tab_content_end() }}
   
-    <div class="tab-pane fade" id="nav-setting" role="tabpanel" aria-labelledby="nav-setting-tab">
+    {{ macros.m_tab_content_start('설정', false) }}
       <form>
       {{ macros.setting_input_text('id', 'ID', value=arg['id'], col='3') }}
-      {{ macros.setting_input_text('pw', '암호', value=arg['pw'], col='3', type='password') }}
-      
-    
-      {{ macros.setting_top('기본 화질') }}
-        <div class="input-group col-sm-3">
-          <select id="quality" name="quality" class="form-control form-control-sm" value="{{arg['quality']}}"> 
-            <option value="FHD">FHD</option>
-            <option value="HD">HD</option>
-            <option value="SD">SD</option>
-          </select>
-        </div>
-      {{ macros.setting_bottom() }}
-
+      {{ macros.setting_input_text_and_buttons('pw', '암호', [['login', '확인']], value=arg['pw'], col='4', type='password') }}
+      {{ macros.setting_select('quality', '기본 화질', [['FHD', 'FHD'], ['HD', 'HD'], ['SD', 'SD']], col='3', value=arg['quality']) }}
       {{ macros.setting_input_text('save_path', '저장 폴더', value=arg['save_path'], desc='정상적으로 완료된 파일이 이동할 폴더 입니다. ') }}
-
       {{ macros.setting_input_int('max_pf_count', '허용 Packet Fail 수', value=arg['max_pf_count'], min='0', desc=['이 값보다 Packet Fail 횟수가 더 많으면 실패처리 합니다.', '0 : Packet Fail이 발생하면 바로 실패처리.', '-1 : 실패처리 하지 않음.']) }}
-
-      {{ macros.setting_input_int('max_retry_count', '재시도', value=arg['max_retry_count'], min='0', desc=['재시도 횟수입니다.', '0일 경우 다시 시도하지 않습니다.']) }}
-        
-      {{ macros.setting_top() }}
-        <div class="col-sm-6 text-left">
-          <button id="setting_save" name="submit" class="btn btn-outline-success">저장</button>
-        </div>
-      {{ macros.setting_bottom() }}
+      {{ macros.setting_button([['setting_save_btn', '저장']]) }}
       </form>
-    </div> <!--tab-pane-->
+    {{ macros.m_tab_content_end() }}
   </div><!--tab-content-->
 </div> <!--전체-->
 
-
-{% endif %} 
 
 <script type="text/javascript">
 $(document).ready(function(){
   
 
   //설정 저장
-  $("#setting_save").click(function(e) {
+  $("#setting_save_btn").click(function(e) {
     e.preventDefault();
     $.ajax({
       url: '/pooq/ajax/setting_save',
@@ -281,10 +250,11 @@ $(document).ready(function(){
       data: {id:id},
       dataType: "json",
       success: function (data) {
+        /*
         document.getElementById("modal_title").innerHTML = "Login Result";
         document.getElementById("modal_body").innerHTML = "<pre>"+JSON.stringify(data, null, 2) + "</pre>";
         $("#large_modal").modal();
-
+        */
         if (data.ret) {
           if (data.data.json.result.isPreview == 'Y') {
             str = '<span style="color:red">권한이 없습니다.</span>'
