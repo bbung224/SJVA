@@ -45,7 +45,7 @@
    {{ macros.m_tab_content_end() }}
       
    {{ macros.m_tab_content_start('설정', false) }}
-    {{ macros.setting_scheduler_button(arg['scheduler'], arg['is_running']) }}
+    {{ macros.setting_scheduler_button(arg['is_include'], arg['is_running']) }}
     <form id='setting' name='setting'>
       {{ macros.setting_input_int('auto_interval', '스케쥴링 실행 주기', value=arg['auto_interval'], min='1', placeholder='10', desc='minute 단위') }}
       {{ macros.setting_checkbox('auto_start', '시작시 자동실행', value=arg['auto_start'], desc='On : 시작시 자동으로 스케쥴러에 등록됩니다.') }}
@@ -53,10 +53,8 @@
       {{ macros.setting_select('auto_quality', '기본 화질', [['FHD', 'FHD'], ['HD', 'HD'], ['SD', 'SD']], col='3', value=arg['auto_quality']) }}
       {{ macros.setting_input_int('auto_page', '탐색 페이지수', value=arg['auto_page'], min='1', placeholder='2') }}
       {{ macros.setting_checkbox('retry_user_abort', '사용자 중지 항목 다시 받기', value=arg['retry_user_abort'], desc='On : 다음 스케쥴링 때 다시 받습니다.') }}
-      {{ macros.setting_checkbox('qvod_download', 'Quick VOD 받기', value=arg['qvod_download']) }}
       {{ macros.setting_input_text('except_channel', '제외 채널', value=arg['except_channel'], desc=[',로 구분', '채널 이름과 일치하면 제외합니다.']) }}
       {{ macros.setting_input_text('except_program', '제외 프로그램', value=arg['except_program'], desc=[',로 구분', '이 곳에 있는 항목이 프로그램에 이름에 포함되어 있으면 제외합니다.']) }}
-      {{ macros.setting_input_text('download_program_in_qvod', 'Quick VOD 중 다운받을 프로그램', value=arg['download_program_in_qvod'], desc=[',로 구분', 'Quick VOD 받기가 Off 일때, 다운받을 프로그램 이름', 'Quick VOD가 On일 경우에는 이 설정과 상관없이 모두 다운']) }}
       {{ macros.setting_button([['setting_save', '저장']]) }}
     </form>
     {{ macros.m_tab_content_end() }}
@@ -64,12 +62,14 @@
 
 <script type="text/javascript">
 var current_data = null;
+var package_name = 'tving';
+
 $(document).ready(function(){
   // 스케쥴링 on / off
   $('#scheduler').change(function() {
     var ret = $(this).prop('checked');
     $.ajax({
-      url: '/pooq/ajax/auto',
+      url: '/' + package_name + '/ajax/auto',
       type: "POST", 
       cache: false,
       data: { scheduler : ret},
@@ -82,28 +82,9 @@ $(document).ready(function(){
   //설정 저장
   $("#setting_save").click(function(e) {
     e.preventDefault();
-    var checkboxs = [$('#auto_start'), $('#retry_user_abort'), $('#qvod_download')];
-    for (var i in checkboxs) {
-	    if ( checkboxs[i].is(':checked') ) {
-        checkboxs[i].val('True');
-      } else {
-        checkboxs[i].val('False');
-      }
-    }
-    var formData = $('#setting').serialize(); 
-    $.each($('form input[type=checkbox]')
-      .filter(function(idx) {
-        return $(this).prop('checked') === false 
-      }), 
-      function(idx, el) { 
-        var emptyVal = "False"; 
-        formData += '&' + $(el).attr('name') + '=' + emptyVal; 
-      }
-    );
-
-
+    var formData = get_formdata('#setting');
     $.ajax({
-      url: '/pooq/ajax/setting_save',
+      url: '/' + package_name + '/ajax/setting_save',
       type: "POST", 
       cache: false,
       data: formData,
@@ -122,10 +103,23 @@ $(document).ready(function(){
     });
   });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
   // 로딩
   $(function() {
     $.ajax({
-      url: '/pooq/ajax/auto_list',
+      url: '/' + package_name + '/ajax/auto_list',
       type: "POST", 
       cache: false,
       data: {},
@@ -140,7 +134,7 @@ $(document).ready(function(){
     e.preventDefault();
     var formData = $('#form_search').serialize();
     $.ajax({
-      url: '/pooq/ajax/auto_list',
+      url: '/' + package_name + '/ajax/auto_list',
       type: "POST", 
       cache: false,
       data: formData,
@@ -158,7 +152,7 @@ $(document).ready(function(){
     document.getElementById("program").value = '';
     var formData = $('#form_search').serialize();
     $.ajax({
-      url: '/pooq/ajax/auto_list',
+      url: '/' + package_name + '/ajax/auto_list',
       type: "POST", 
       cache: false,
       data: formData,
@@ -177,7 +171,7 @@ $(document).ready(function(){
     var formData = $('#form_search').serialize();
     formData += '&page=' + $(this).data('page');
     $.ajax({
-      url: '/pooq/ajax/auto_list',
+      url: '/' + package_name + '/ajax/auto_list',
       type: "POST", 
       cache: false,
       data: formData,
@@ -211,7 +205,7 @@ $(document).ready(function(){
     document.getElementById("program").value = $(this).data('program');
     var formData = $('#form_search').serialize();
     $.ajax({
-      url: '/pooq/ajax/auto_list',
+      url: '/' + package_name + '/ajax/auto_list',
       type: "POST", 
       cache: false,
       data: formData,
@@ -226,7 +220,7 @@ $(document).ready(function(){
     e.preventDefault();
     var program = $(this).data('program');
     $.ajax({
-      url: '/pooq/ajax/except',
+      url: '/' + package_name + '/ajax/except',
       type: "POST", 
       cache: false,
       data: {program:program},
@@ -241,7 +235,7 @@ $(document).ready(function(){
     e.preventDefault();
     var channel = $(this).data('channel');
     $.ajax({
-      url: '/pooq/ajax/except',
+      url: '/' + package_name + '/ajax/except',
       type: "POST", 
       cache: false,
       data: {channel:channel},
@@ -275,7 +269,7 @@ function make_list(ret) {
   current_data = ret
   window.scrollTo(0,0);
   //document.getElementById("modal_title").innerHTML = "Login Result";
-  //document.getElementById("modal_body").innerHTML = "<pre>"+JSON.stringify(data, null, 2) + "</pre>";
+  //document.getElementById("modal_body").innerHTML = "<pre>"+JSON.stringify(ret, null, 2) + "</pre>";
   //$("#large_modal").modal();
   data = ret.list;
   str = '';
@@ -283,7 +277,10 @@ function make_list(ret) {
     str += '<hr>';
     str += '<div class="row">';
     str += '<div class="col-sm-3">'
-    str += '<img src="' + data[i].poster_url + '" class="img-fluid">'
+    if (data[i].json != null)  {
+      tmp = "http://image.tving.com" + data[i].json.body.content.info.episode.image[0].url;
+      str += '<img src="' + tmp + '" class="img-fluid">'
+    }
     str += '</div>';
     str += '<div class="col-sm-9">'
     str += '<div>';
@@ -292,9 +289,16 @@ function make_list(ret) {
       str += data[i].frequency + '회';
     }
     str += '</strong>';
-    str += ' (' + data[i].json.result.airDate + ')'
+    str += ' (' + data[i].broadcast_date + ')'
     str += ' ' + data[i].channel_name
-    str += ' ' + data[i].quality_str
+    if (data[i].qualitu == 'stream50') {
+      tmp = '1080p'
+    } else if (data[i].qualitu == 'stream40') {
+      tmp = '720p'
+    } else {
+      tmp = '480p'
+    }
+    str += ' ' + tmp
     if (data[i].vod_type == 'qvod') {
       str += ' ' + '<span style="color:red">퀵VOD</span>'
     }
