@@ -227,9 +227,9 @@ $(document).ready(function(){
   $("body").on('click', '#basic_search', function(e){
     e.preventDefault();
     code = $(this).data('code');
-    var redirect = '/pooq/basic';
+    var redirect = '/tving/basic';
     $.redirectPost(redirect, {code: code});
-    $(location).attr('href', '/pooq/basic?code=' + code)
+    $(location).attr('href', '/tving/basic?code=' + code)
   });
 
   $("body").on('click', '#json', function(e){
@@ -371,7 +371,7 @@ function make_list(ret) {
     //str += '<div class="col-sm-9">'
     str += '<div>';
     str += '<div class="btn-group btn-group-sm flex-wrap mr-2" role="group">';
-    str += '<button id="basic_search" name="submit" class="btn btn-sm  btn-outline-success" data-code="'+data[i].episode_code+'.' +data[i].corner_id + '">에피소드 검색</button>';
+    str += '<button id="basic_search" name="submit" class="btn btn-sm  btn-outline-success" data-code="'+data[i].episode_code+'">에피소드 검색</button>';
     str += '<button id="basic_search" name="submit" class="btn btn-sm  btn-outline-success" data-code="'+data[i].program_code+ '">프로그램 검색</button>';
     str += '<button id="json" name="submit" class="btn btn-sm  btn-outline-success" data-idx="'+i+ '">JSON</button>';
     str += '<button id="program_search" class="btn btn-sm btn-outline-success" data-program="'+data[i].program_name+ '">목록 검색</button>';

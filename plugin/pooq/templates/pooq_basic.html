@@ -328,7 +328,7 @@ function make_program_page(data) {
   }
   
   if (data.data.length >= 30) {
-    str = '<form>';
+    str = '<div class="d-inline-block"></div><form>';
     str += '<button id="more_btn" class="btn btn-outline-secondary btn-lg btn-block" type="button" data-code="'+data.code+'" data-page="'+data.page+'">More</button>'
     str += '</form>';
     document.getElementById("more").innerHTML = str;
