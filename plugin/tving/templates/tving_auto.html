@@ -103,6 +103,47 @@ $(document).ready(function(){
     });
   });
 
+  $("body").on('click', '#except_program_btn', function(e){
+    e.preventDefault();
+    var program = $(this).data('program');
+    $.ajax({
+      url: '/' + package_name + '/ajax/except',
+      type: "POST", 
+      cache: false,
+      data: {program:program},
+      dataType: "json",
+      success: function (data) {
+        except_result_process(data);
+      }
+    });
+  });
+
+  $("body").on('click', '#except_channel_btn', function(e){
+    e.preventDefault();
+    var channel = $(this).data('channel');
+    $.ajax({
+      url: '/' + package_name + '/ajax/except',
+      type: "POST", 
+      cache: false,
+      data: {channel:channel},
+      dataType: "json",
+      success: function (data) {
+        except_result_process(data);
+      }
+    });
+  });
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -216,38 +257,6 @@ $(document).ready(function(){
     });
   });
 
-  $("body").on('click', '#except_program_btn', function(e){
-    e.preventDefault();
-    var program = $(this).data('program');
-    $.ajax({
-      url: '/' + package_name + '/ajax/except',
-      type: "POST", 
-      cache: false,
-      data: {program:program},
-      dataType: "json",
-      success: function (data) {
-        except_result_process(data);
-      }
-    });
-  });
-
-  $("body").on('click', '#except_channel_btn', function(e){
-    e.preventDefault();
-    var channel = $(this).data('channel');
-    $.ajax({
-      url: '/' + package_name + '/ajax/except',
-      type: "POST", 
-      cache: false,
-      data: {channel:channel},
-      dataType: "json",
-      success: function (data) {
-        except_result_process(data);
-      }
-    });
-  });
-
-
-
 });
 
 function except_result_process(data) {
@@ -291,9 +300,9 @@ function make_list(ret) {
     str += '</strong>';
     str += ' (' + data[i].broadcast_date + ')'
     str += ' ' + data[i].channel_name
-    if (data[i].qualitu == 'stream50') {
+    if (data[i].quality == 'stream50') {
       tmp = '1080p'
-    } else if (data[i].qualitu == 'stream40') {
+    } else if (data[i].quality == 'stream40') {
       tmp = '720p'
     } else {
       tmp = '480p'
