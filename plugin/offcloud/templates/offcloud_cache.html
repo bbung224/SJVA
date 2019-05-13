@@ -1,102 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
 <div>
-  <nav> 
-    {{ macros.m_tab_head_start() }}
-      {{ macros.m_tab_head('일반', false) }}
-      {{ macros.m_tab_head('작업', true) }}
-    {{ macros.m_tab_head_end() }} 
-  </nav>  
-  <div class="tab-content" id="nav-tabContent">
-     <!-- 일반 -->
-     {{ macros.m_tab_content_start('일반', false) }}
-      {{ macros.setting_scheduler_button(arg['is_include'], arg['is_running']) }}
-      <form id='setting' name='setting'>
-        {{ macros.setting_input_int('interval', '스케쥴링 실행 주기', value=arg['interval'], min='1', placeholder='10', desc='minute 단위') }}
-    
-        {{ macros.setting_checkbox('auto_start', '시작시 자동실행', value=arg['auto_start'], desc='On : 시작시 자동으로 스케쥴러에 등록됩니다.') }}
-        {{ macros.setting_input_text_and_buttons('apikey', 'API Key', [['apikey_btn', '확인']], value=arg['apikey'], desc='https://offcloud.com/#/account') }}
-        {{ macros.setting_button([['setting_save', '저장']]) }}
-      </form>
-    {{ macros.m_tab_content_end() }}
-
-    <!-- 작업 -->
-    {{ macros.m_tab_content_start('작업', true) }}
-      {{ macros.m_row_start() }}  
-      {{ macros.m_button('add_job_btn', '작업 추가') }}
-      {{ macros.m_row_end() }}  
-
-      {{ macros.m_hr_head_top() }}
-      {{ macros.m_row_start('0') }}
-      {{ macros.m_col(1, macros.m_strong('ID')) }}
-      {{ macros.m_col(5, macros.m_strong('RSS Info')) }}
-      {{ macros.m_col(5, macros.m_strong('Offcloud Info')) }}
-      {{ macros.m_col(1, macros.m_strong('Action')) }}
-      {{ macros.m_row_end() }}
-      {{ macros.m_hr_head_bottom() }}
-      <div id="job_list_div"></div>
-    {{ macros.m_tab_content_end() }}
-
-  </div><!--tab-content-->
-</div> <!--전체-->
-
-
-<!-- Modal -->
-{{ macros.m_modal_start('job_modal', '작업 추가', 'modal-lg') }}
-  <form id="job_form">
-  {{ macros.setting_top('RSS URL') }}
-    <div class="input-group col-sm-9">
-      <input id="job_rss_url" name="job_rss_url" type="text" class="form-control form-control-sm" placeholder="" >
-      <span class='text-left' style="padding-left:10px; padding-top:0px">
-        <button id="job_test_rss_btn" class="btn btn-sm btn-outline-success">링크</button>
-      </span>
-    </div>
-  {{ macros.setting_bottom() }}
-
-  {{ macros.setting_input_int('job_interval', 'RSS 갱신 주기', min='1', placeholder='10', desc='minute 단위', value='10') }}
-
-  {{ macros.setting_checkbox('job_auto_start', '시작시 자동실행', value=arg['auto_start'], desc='On : 시작시 자동으로 스케쥴러에 등록됩니다.') }}
-
-  {{ macros.setting_input_text('job_include_keyword', '포함 검색어', desc=['검색어가 포함되어 있으면 다운로드 합니다.', '값이 없으면 전체 목록을 다운로드 합니다.', ',으로 구분하며 각 검색어는 OR 조건으로 동작합니다.'], placeholder='예) 720p, 1080p, NEXT') }}
-
-  {{ macros.setting_input_text('job_exclude_keyword', '제외 검색어', desc=['검색어가 포함되어 있으면 다운로드 하지 않습니다.', ',으로 구분'], placeholder='예) 360p, 뉴스') }}
-
-  {{ macros.setting_checkbox('job_use_daum', 'Daum 검색 사용', desc='국내 TV 영상인 경우에만 사용') }}
-  
-  {{ macros.setting_checkbox('job_except_if_not_exist_in_daum', '미검색시 다운로드 제외') }}
-
-  {{ macros.setting_input_text('job_include_genre', '포함 장르', placeholder='예) 드라마, 예능', desc=['일치하는 장르만 다운 받습니다.', '값이 없으면 전체 장르를 다운로드 합니다']) }}
-
-  {{ macros.setting_input_text('job_exclude_genre', '제외 장르', placeholder='예) 중국드라마') }}
-  <hr>
-  {{ macros.setting_input_text('job_account', 'Account', col='4', desc=['Offcloud Remote accounts의 Username']) }}
-  
-  {{ macros.setting_input_text('job_default_folderid', '기본 Folder ID') }}
-  
-  {{ macros.setting_top('Folder ID 목록') }}
-  <div class="input-group col-sm-9">
-    <div class="row col-sm-12" class="padding-left:10px">
-      <button id="job_add_keyword_folderid_btn" class="btn btn-sm btn-outline-success">+</button>
-    </div>
-    <div class="row col-sm-12 form-inline">
-        <div class="col-sm-5" style="text-align:left;padding:0px;">키워드</div>
-        <div class="col-sm-5" style="text-align:left;padding:0px;">FolderID</div>
-    </div>
-    <div id="reset_div">
-      <div id="add_child_folderid_div">
-      </div>
-    </div>
-  </div>
-  {{ macros.setting_bottom(desc='키워드 포함시 저장될 Folder ID') }}
-  </form>
-{{ macros.m_modal_end() }}
+    {{ macros.setting_input_text_and_buttons('hash', 'Hash', [['cache_btn', '확인']], value='', desc='마그넷 or hash') }}
+</div>
 
 
 
 <script type="text/javascript">
 var package_name = 'offcloud';
+
 var current_data;
 var current_group_id;
+
+
+$("body").on('click', '#cache_btn', function(e){
+  e.preventDefault();
+  hash = document.getElementById("hash").value;
+  if (hash == '') {
+    $.notify('<strong>hash를 입력하세요</strong>', {
+      type: 'warning'
+    });
+    return;
+  }
+  $.ajax({
+      url: '/' + package_name + '/ajax/hash',
+      type: "POST", 
+      cache: false,
+      data:{hash:hash},
+      dataType: "json",
+      success: function (data) {
+        document.getElementById("modal_title").innerHTML = "JSON";
+        document.getElementById("modal_body").innerHTML = "<pre>"+JSON.stringify(data, null, 2) + "</pre>";
+        $("#large_modal").modal();
+      }
+    });
+});
+
+
 
 function add_child_folderid_div(i) {
   str = ' \
@@ -121,44 +61,9 @@ function add_child_folderid_div(i) {
 
 
 $(document).ready(function(){
-  $.ajax({
-    url: '/' + package_name + '/ajax/job_list',
-    type: "POST", 
-    cache: false,
-    data:{},
-    dataType: "json",
-    success: function (data) {
-      current_data = data;
-      document.getElementById("modal_title").innerHTML = "JSON";
-      document.getElementById("modal_body").innerHTML = "<pre>"+JSON.stringify(data, null, 2) + "</pre>";
-      $("#large_modal").modal();
-      make_job_list(data.jobs);
-    }
-  });
+  
 
-
-  $("body").on('click', '#apikey_btn', function(e){
-    e.preventDefault();
-    apikey = document.getElementById("apikey").value;
-    if (apikey == '') {
-      $.notify('<strong>APIKEY를 입력하세요</strong>', {
-        type: 'warning'
-      });
-      return;
-    }
-    $.ajax({
-        url: '/offcloud/ajax/apikey',
-        type: "POST", 
-        cache: false,
-        data:{apikey:apikey},
-        dataType: "json",
-        success: function (data) {
-          document.getElementById("modal_title").innerHTML = "JSON";
-          document.getElementById("modal_body").innerHTML = "<pre>"+JSON.stringify(data, null, 2) + "</pre>";
-          $("#large_modal").modal();
-        }
-      });
-  });
+  
 
   //설정 저장
   $("#setting_save").click(function(e) {

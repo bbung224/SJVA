@@ -61,7 +61,7 @@ $(document).ready(function(){
   var socket = io.connect(protocol + "//" + document.domain + ":" + location.port + "/log");
   //var socket = io.connect("http://" + document.domain + ":" + location.port + "/log", {transports:['websocket']},  {'force new connection': true});
 
-  socket.emit("start", {'package':'{{package[0]}}'} );
+  socket.emit("start", {'package':'{{package}}'} );
   
   socket.on('on_start', function(data){
     document.getElementById("log").innerHTML += data.data;
@@ -71,7 +71,7 @@ $(document).ready(function(){
   });
 
   socket.on('add', function(data){
-    if (data.package == "{{package[0]}}") {
+    if (data.package == "{{package}}") {
       var chk = $('#auto_scroll').is(":checked");
       document.getElementById("add").innerHTML += data.data;
       if (chk) document.getElementById("add").scrollTop = document.getElementById("add").scrollHeight;
