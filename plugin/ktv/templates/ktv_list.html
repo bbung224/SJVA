@@ -65,9 +65,6 @@ $("body").on('click', '#play_btn', function(e) {
 });
 
 
-
-
-
 function request_search(page) {
   var formData = get_formdata('#form_search')
   formData += '&page=' + page;
@@ -113,8 +110,10 @@ function make_list(data) {
     tmp = '<strong><li>원본 : </strong>' + data[i].original_filename + '<br>'
     tmp += '<strong><li>파일명 : </strong>' + data[i].filename + '<br>'
     tmp += '<strong><li>Plex 경로 : </strong>' + data[i].plex_abspath + '<hr>'
-    tmp += '<pre>' + data[i].log.replace('<', '&lt;').replace('>', '&gt;') + '</pre>'
-    tmp += '<hr>'
+    if (data[i].log != null) {
+      tmp += '<pre>' + data[i].log.replace('<', '&lt;').replace('>', '&gt;') + '</pre>'
+      tmp += '<hr>'
+    }
     tmp1 = ''
     if (data[i].plex_part != null)  {
       tmp1 = m_button('play_btn', '재생', [{'key':'url', 'value':data[i].plex_part}]);
