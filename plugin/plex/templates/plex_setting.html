@@ -18,7 +18,7 @@
         {{ macros.setting_select_and_buttons('server_name', '서버', [[arg['server_name'], arg['server_name']]], [['server_connect_btn', '서버확인']], col='6', value=arg['server_name']) }}
           
       </div>
-      {{ macros.setting_input_text('server_url', 'Plex URL', value=arg['server_url'], col='6', desc='SJVA와 PLEX간 네트워크가 다른 경우 DDNS로 입력하세요') }}
+      {{ macros.setting_input_text('server_url', 'Plex URL', value=arg['server_url'], col='6', desc='SJVA와 PLEX간 네트워크가 다른 경우 DDNS나 고정 IP로 입력하세요') }}
       {{ macros.setting_input_text_and_buttons('server_token', 'Plex Token', [['server_connect_by_token_btn', '접속확인'], ['sjva_plugin_test_btn', 'SJVA 플러그인 확인']], value=arg['server_token'], col='9') }}
 
       {{ macros.setting_button([['setting_save_btn', '저장']]) }}
