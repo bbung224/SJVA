@@ -50,7 +50,7 @@ $("body").on('click', '#page', function(e){
 
 
 // 재생 버튼
-$("body").on('click', '#play_btn', function(e) {
+$("body").on('click', '#link_btn', function(e) {
   e.preventDefault();
   url = $(this).data('url')
   window.open(url, "_blank");
@@ -107,7 +107,8 @@ function make_list(data) {
     }
     tmp1 = ''
     if (data[i].plex_part != null)  {
-      tmp1 = m_button('play_btn', '재생', [{'key':'url', 'value':data[i].plex_part}]);
+      tmp1 = m_button('link_btn', '재생', [{'key':'url', 'value':data[i].plex_part}]);
+      tmp1 += m_button('link_btn', 'PLEX', [{'key':'url', 'value':'https://app.plex.tv/desktop#!/server/' + current_data.plex_server_hash + '/details?key=/library/metadata/' + data[i].plex_show_id}]);
       tmp1 = m_button_group(tmp1)
     }
     str += m_col(6, tmp+tmp1);
