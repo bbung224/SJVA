@@ -33,7 +33,6 @@
   <div id="rclone_setting_div" class="collapse">
 
   {{ macros.setting_input_text('rclone_path', 'RClone Path', placeholder='예)gdrive:/video/[방송중]', desc=['RClone일 경우 입력', '라이브러리 폴더의 RClone 경로']) }}
-  {{ macros.setting_input_text('local_path', 'Local Sync 폴더', disabled=true, desc='저장, 삭제시 RClone 플러그인 작업 항목과 자동 연동') }}
   </div>
 
   {{ macros.setting_input_text('replace_for_plex_source', 'Plex 경로. source', placeholder='예)/mnt/gdrive/video') }}
@@ -122,7 +121,6 @@ $(document).ready(function(){
   $("body").on('click', '#library_setting_btn', function(e){
     e.preventDefault();
     id = $(this).data('id')
-    console.log(id)
     for (i in current_data.library_list) {
       if (id == current_data.library_list[i].id) {
         document.getElementById("library_modal_title").innerHTML = '라이브러리 폴더 수정';
@@ -152,9 +150,6 @@ $(document).ready(function(){
       return
     }
     var formData = get_formdata('#library_setting');
-    formData += '&local_path=' + document.getElementById("local_path").value;
-    
-    console.log(formData)
     $.ajax({
       url: '/' + package_name + '/ajax/library_save',
       type: "POST", 
