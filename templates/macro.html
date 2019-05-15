@@ -307,6 +307,14 @@
   <button id="{{id}}" name="{{id}}" class="btn btn-sm btn-outline-success">{{text}}</button>
 {% endmacro %}
 
+{% macro m_button_group(buttons) %}
+  <div class="btn-group btn-group-sm flex-wrap mr-2" role="group">
+    {% for item in buttons %}
+      <button id="{{item[0]}}" name="{{item[0]}}" class="btn btn-sm btn-outline-success">{{item[1]}}</button>
+    {% endfor %}
+  </div>
+{% endmacro %}
+
 {% macro m_tab_head_start() %}
   
     <div class="nav nav-tabs" id="nav-tab" role="tablist">

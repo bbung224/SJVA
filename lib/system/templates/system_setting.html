@@ -72,9 +72,16 @@ $(document).ready(function(){
       data:{ddns:ddns},
       dataType: "json",
       success: function (data) {
-        $.notify('<strong>Version:'+ data+'</strong>', {
-          type: 'success'
-        });
+        console.log(data)
+        if (data == 'fail') {
+          $.notify('<strong>접속에 실패하였습니다.</strong>', {
+            type: 'warning'
+          });
+        } else {
+          $.notify('<strong>Version:'+ data+'</strong>', {
+            type: 'success'
+          });
+        }
       }
     });
   });
