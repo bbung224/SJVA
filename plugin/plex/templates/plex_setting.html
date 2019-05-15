@@ -109,7 +109,6 @@ $(document).ready(function(){
       data:{server_name:server_name},
       dataType: "json",
       success: function (data) {
-        console.log(data)
         document.getElementById("server_url").value = data[0];
         document.getElementById("server_token").value = data[1];
         document.getElementById("machineIdentifier").value = data[2];
