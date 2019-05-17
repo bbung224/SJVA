@@ -3,7 +3,7 @@
 
 <form id="form_search" class="form-inline" style="text-align:left">
   <div class="container-fluid">
-    <div class="row show-grid border border-secondary">
+    <div class="row show-grid">
       <div class="col-md-4 form-inline">
         <div class="custom-control custom-radio col-md-3" style="align-items:left; text-align:left;">
           <input id="site_radio" type="radio" name="radio" value="site" class="custom-control-input" checked>
@@ -54,6 +54,15 @@
   </div>
 </form>
 <div id='page1'></div>
+{{ macros.m_hr_head_top() }}
+{{ macros.m_row_start('0') }}
+{{ macros.m_col(1,  macros.m_strong('ID')) }}
+{{ macros.m_col(2,  macros.m_strong('Created Time')) }}
+{{ macros.m_col(1,  macros.m_strong('Site')) }}
+{{ macros.m_col(2,  macros.m_strong('Board Info')) }}
+{{ macros.m_col(6,  macros.m_strong('Feed Info')) }}
+{{ macros.m_row_end() }}
+{{ macros.m_hr_head_bottom() }}
 <div id="list_div"></div>
 <div id='page2'></div>
 
@@ -128,96 +137,36 @@ $(document).ready(function(){
 
 
 function make_list_html(data) {
-  /*
-  str = '<div class="row"> \
-          <div class="col-sm-1" style="text-align:center;" style="padding-top:0px; padding-bottom:0px">ID</div> \
-          <div class="col-sm-1" style="text-align:center;" style="padding-top:0px; padding-bottom:0px">시간</div> \
-          <div class="col-sm-1" style="text-align:left;" style="padding-top:0px; padding-bottom:0px">사이트</div> \
-          <div class="col-sm-1" style="text-align:left;" style="padding-top:0px; padding-bottom:0px">게시판</div> \
-          <div class="col-sm-7" style="text-align:left;" style="padding-top:0px; padding-bottom:0px">마지막 게시물</div> \
-        </div> \
-        <hr style="width: 100%; color: black; height: 2px; background-color:black;" />'
-  */
-  str = '<hr style="width: 100%; color: black; height: 2px; background-color:black;" />';        
+  str = '';
   for(var i in data) {
-    str += ' \
-      <div class="row"> \
-        <div class="col-sm-1" style="text-align: center;" style="padding-top:0px; padding-bottom:0px">'
-    str += data[i].id;
-    str += '\
-        </div> \
-        <div class="col-sm-2" style="text-align: left;" style="padding-top:0px; padding-bottom:0px"> \
-          ' + data[i].created_time + ' \
-        </div> \
-        <div class="col-sm-1" style="text-align: left;" style="padding-top:0px; padding-bottom:0px"> \
-          ' + data[i].site + ' \
-        </div> \
-        <div class="col-sm-2" style="text-align: left;" style="padding-top:0px; padding-bottom:0px"> \
-          ' + data[i].board + '<br>' + data[i].board_id + ' \
-        </div> \
-        <div class="col-sm-6" style="text-align: left;" style="padding-top:0px; padding-bottom:0px">';
-    //str += '<pre>' + JSON.stringify(data[i], null, 2) + '</pre>';
-    str += '<pre>';
-    str += '<a href="'+data[i].url +'" target="_blank">' + data[i].title + '</a>'
-    str += '<br><hr style="width: 100%; margin-bottom:4px; margin-top:4px; bottom=0px;" />';
+    str += m_row_start();
+    str += m_col(1, data[i].id);
+    str += m_col(2, data[i].created_time);
+    str += m_col(1, data[i].site);
+    str += m_col(2, data[i].board + '<br>' + data[i].board_id);
+
+    tmp = '<pre>';
+    tmp += '<a href="'+data[i].url +'" target="_blank">' + data[i].title + '</a>'
+    tmp += '<br><hr style="width: 100%; margin-bottom:4px; margin-top:4px; bottom=0px;" />';
 
     for (var j in data[i].files) {
       if (data[i].files[j].link != '') {
-        str += '<a href="/rss/download/' + data[i].files[j].id+ '">' + data[i].files[j].filename + '</a><br>';
+        tmp += '<a href="/rss/download/' + data[i].files[j].id+ '">' + data[i].files[j].filename + '</a><br>';
       }
-      str += '<a href="'+data[i].files[j].magnet + '">' + data[i].files[j].magnet + '</a>';
+      tmp += '<a href="'+data[i].files[j].magnet + '">' + data[i].files[j].magnet + '</a>';
       if (j != data[i].files.length-1) {
-        str += '<hr style="width: 100%; margin-bottom:4px; margin-top:4px; bottom=0px;" />';
-        //str += '<hr>';
+        tmp += m_hr();
       }
-    } 
-    str += '</pre>';
-    /*
-    str += ' \
-          <div class="input-group col-sm-6" style="padding-left:0px"> \
-            <span class="text-left" > \
-              <button id="remove_scheduler_btn" class="btn btn-sm btn-outline-success" data-id="' + data[i].id + '">스케쥴 삭제</button> \
-            </span> \
-          </div>'
-    */
-    str += ' \
-        </div> \
-      </div> \
-      <hr style="width: 100%; margin-top:2px;" />';
+    }
+    tmp += '</pre>';
+    str += m_col(6, tmp);
+    str += m_row_end();
+    if (i != data.length -1) str += m_hr();
   }
   document.getElementById("list_div").innerHTML = str;
 }
 
-function make_page_html(data) {
-  str = ' \
-    <div class="d-inline-block"></div> \
-      <div class="row"> \
-        <div class="col-sm-12"> \
-          <div class="btn-toolbar" style="justify-content: center;" role="toolbar" aria-label="Toolbar with button groups" > \
-            <div class="btn-group btn-group-sm mr-2" role="group" aria-label="First group">'
-  if (data.prev_page) {
-    str += '<button id="page" data-page="' + (data.start_page-1) + '" type="button" class="btn btn-secondary">&laquo;</button>'
-  }
 
-  for (var i = data.start_page ; i <= data.last_page ; i++) {
-    str += '<button id="page" data-page="' + i +'" type="button" class="btn btn-secondary" ';
-    if (i == data.current_page) {
-      str += 'disabled';
-    }
-    str += '>'+i+'</button>';
-  }
-  if (data.next_page) {
-    str += '<button id="page" data-page="' + (data.last_page+1) + '" type="button" class="btn btn-secondary">&raquo;</button>'
-  }
-
-  str += '</div> \
-    </div> \
-    </div> \
-    </div> \
-  '
-  document.getElementById("page1").innerHTML = str;
-  document.getElementById("page2").innerHTML = str;  
-}
 
 function request_search(page) {
   var formData = $('#form_search').serialize(); 

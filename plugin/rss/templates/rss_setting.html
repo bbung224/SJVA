@@ -16,6 +16,7 @@
 
     <!-- 사이트 -->
     <div class="tab-pane fade show active" id="nav-site" role="tabpanel" aria-labelledby="nav-site-tab">
+      <!--
       <div class='row'>
         <div class='col-sm-12' style="align-items: left; text-align: left;">
           <div class="btn-group btn-group-sm flex-wrap mr-2" role="group">
@@ -24,7 +25,15 @@
           </div>
         </div>
       </div>
-      <hr>
+      -->
+      {{ macros.m_hr_head_top() }}
+      {{ macros.m_row_start('0') }}
+      {{ macros.m_col(1,  macros.m_strong('ID')) }}
+      {{ macros.m_col(2,  macros.m_strong('Site')) }}
+      {{ macros.m_col(2,  macros.m_strong('Info')) }}
+      {{ macros.m_col(7,  macros.m_strong('Detail')) }}
+      {{ macros.m_row_end() }}
+      {{ macros.m_hr_head_bottom() }}
       <div id="site_list_div">
       </div>
       
@@ -32,76 +41,50 @@
   
     <!-- 스케쥴링 -->
     <div class="tab-pane fade show" id="nav-scheduler" role="tabpanel" aria-labelledby="nav-scheduler-tab">
-        
-      {{ macros.setting_top('전체 스케쥴링 작동') }}
-      <div class="input-group col-sm-3">
-        {% if arg['scheduler'] == 'True' %}
-        <input id="scheduler" name="scheduler" class="form-control form-control-sm" type="checkbox" data-toggle="toggle" checked>
-          
-        {% else %}
-        <input id="scheduler" name="scheduler" class="form-control form-control-sm" type="checkbox" data-toggle="toggle">
-        {% endif %}
-        {% if arg['is_running'] == 'True' %}
-          <span style="padding-left:10px; padding-top: 8px;">동작중</span>
-        {% else %}    
-          {% if arg['scheduler'] == 'True' %}
-            <span style="padding-left:10px; padding-top: 8px;">대기중</span>
-          {% endif %}  
-        {% endif %}    
-      </div>
-      {{ macros.setting_bottom(['On : 스케쥴링 시작','Off : 스케쥴링 중지']) }}
-      <form id='setting' name='setting'>
-        {{ macros.setting_input_int('interval', '스케쥴링 실행 주기', value=arg['interval'], min='1', placeholder='10', desc='minute 단위') }}
-    
-        {{ macros.setting_checkbox('auto_start', '시작시 자동실행', value=arg['auto_start'], desc='On : 시작시 자동으로 스케쥴러에 등록됩니다.') }}
-  
-        {{ macros.setting_top() }}
-          <div class="col-sm-6 text-left">
-            <button id="setting_save" name="submit" class="btn btn-outline-success">저장</button>
-          </div>
-        {{ macros.setting_bottom() }}
-      </form>
-      <hr>
-      <div class='row'>
-        <div class='col-sm-12' style="align-items: left; text-align: left;">
-          <div class="btn-group btn-group-sm flex-wrap mr-2" role="group">
-            <button id="scheduler_add_btn" class="btn btn-outline-success">작업 추가</button>
-          </div>
-        </div>
-      </div>
-      <!--<hr>-->
-      <div id="scheduler_list_div">
-      </div>
+      {{ macros.m_row_start() }}  
+      {{ macros.m_button('scheduler_add_btn', '작업 추가') }}
+      {{ macros.m_row_end() }}  
+      {{ macros.m_hr_head_top() }}
+      {{ macros.m_row_start('0') }}
+      {{ macros.m_col(1, macros.m_strong('ID')) }}
+      {{ macros.m_col(2, macros.m_strong('Site')) }}
+      {{ macros.m_col(2, macros.m_strong('Board')) }}
+      {{ macros.m_col(7, macros.m_strong('Last Feed')) }}
+      {{ macros.m_row_end() }}
+      {{ macros.m_hr_head_bottom() }}
+      <div id="scheduler_list_div"></div>
     </div> <!--tab-pane-->
     
     <!-- 그룹 -->
     <div class="tab-pane fade show" id="nav-group" role="tabpanel" aria-labelledby="nav-group-tab">
-      <div class='row'>
-        <div class='col-sm-12' style="align-items: left; text-align: left;">
-          <div class="btn-group btn-group-sm flex-wrap mr-2" role="group">
-            <button id="group_add_btn" class="btn btn-outline-success">그룹 추가</button>
-          </div>
-        </div>
-      </div>
-      <hr>
-      <div id="group_list_div">
-      </div>
+      {{ macros.m_row_start() }}  
+      {{ macros.m_button('group_add_btn', '그룹 추가') }}
+      {{ macros.m_row_end() }}  
+      {{ macros.m_hr_head_top() }}
+      {{ macros.m_row_start('0') }}
+      {{ macros.m_col(1, macros.m_strong('ID')) }}
+      {{ macros.m_col(2, macros.m_strong('Group Name')) }}
+      {{ macros.m_col(4, macros.m_strong('Board')) }}
+      {{ macros.m_col(5, macros.m_strong('Last Feed')) }}
+      {{ macros.m_row_end() }}
+      {{ macros.m_hr_head_bottom() }}
+      <div id="group_list_div"></div>
     </div> <!--tab-pane-->
-
-
 
     
      <!-- 일반 -->
     <div class="tab-pane fade" id="nav-normal" role="tabpanel" aria-labelledby="nav-normal-tab">
-      <form id='setting_normal' name='setting_normal'>
+      {{ macros.setting_scheduler_button(arg['scheduler'], arg['is_running']) }}
+      <form id='setting' name='setting'>
+        {{ macros.setting_input_int('interval', '스케쥴링 실행 주기', value=arg['interval'], min='1', placeholder='10', desc='minute 단위') }}
+    
+        {{ macros.setting_checkbox('auto_start', '시작시 자동실행', value=arg['auto_start'], desc='On : 시작시 자동으로 스케쥴러에 등록됩니다.') }}
         {{ macros.setting_input_int('feed_count', 'RSS 피드 수', value=arg['feed_count'], min='1', placeholder='100') }}
         {{ macros.setting_input_int('web_page_size', '웹 페이지당 게시물 수', value=arg['web_page_size'], min='1', placeholder='30') }}
-        {{ macros.setting_top() }}
-          <div class="col-sm-6 text-left">
-            <button id="setting_normal_save" name="submit" class="btn btn-outline-success">저장</button>
-          </div>
-        {{ macros.setting_bottom() }}
-      </form>      
+
+        {{ macros.setting_button([['setting_save', '저장']]) }}
+      </form>
+
     </div> <!--tab-pane-->
 
   </div><!--tab-content-->
@@ -304,24 +287,7 @@ $(document).ready(function(){
   //설정 저장
   $("#setting_save").click(function(e) {
     e.preventDefault();
-    var checkboxs = [$('#auto_start')];
-    for (var i in checkboxs) {
-	    if ( checkboxs[i].is(':checked') ) {
-        checkboxs[i].val('True');
-      } else {
-        checkboxs[i].val('False');
-      }
-    }
-    var formData = $('#setting').serialize(); 
-    $.each($('form input[type=checkbox]')
-      .filter(function(idx) {
-        return $(this).prop('checked') === false 
-      }), 
-      function(idx, el) { 
-        var emptyVal = "False"; 
-        formData += '&' + $(el).attr('name') + '=' + emptyVal; 
-      }
-    );
+    var formData = get_formdata('#setting');
     $.ajax({
       url: '/rss/ajax/setting_save',
       type: "POST", 
@@ -541,30 +507,7 @@ $(document).ready(function(){
     });
   });
   
-  ////////////////////////////////////////// 일반
-  //설정 저장
-  $("#setting_normal_save").click(function(e) {
-    e.preventDefault();
-    var formData = $('#setting_normal').serialize(); 
-    $.ajax({
-      url: '/rss/ajax/setting_save',
-      type: "POST", 
-      cache: false,
-      data: formData,
-      dataType: "json",
-      success: function (ret) {
-        if (ret) {
-          $.notify('<strong>설정을 저장하였습니다.</strong>', {
-	          type: 'success'
-          });
-        } else {
-          $.notify('<strong>설정 저장에 실패하였습니다.</strong>', {
-	          type: 'warning'
-          });
-        }
-      }
-    });
-  });
+  
 });
 
 
@@ -573,12 +516,9 @@ $(document).ready(function(){
 function make_site_list(data) {
   str = ''
   for(var i in data) {
-    str += ' \
-      <div class="row"> \
-        <div class="col-sm-1" style="text-align: center;">'
-    str += parseInt(i)+1;
+    str += m_row_start();
+    str += m_col(1, parseInt(i)+1);
     str += '\
-        </div> \
         <div class="col-sm-2"> \
           <strong>' + data[i].NAME + '</strong><br> \
           <a href="' + data[i].TORRENT_SITE_URL + '" target="_blank">' + data[i].TORRENT_SITE_URL + '</a> \
@@ -614,22 +554,15 @@ function make_site_list(data) {
     str += ' \
             </span> \
           </div> \
-        </div> \
-      </div> \
-      <hr>';
+        </div>'
+    str += m_row_end();
+    if (i != data.length -1) str += m_hr();
   }
   document.getElementById("site_list_div").innerHTML = str;
 }
 
 function make_scheduler_list(data) {
-  str = '<div class="row"> \
-          <div class="col-sm-1" style="text-align:center;" style="padding-top:0px; padding-bottom:0px">NO</div> \
-          <div class="col-sm-2" style="text-align:left;" style="padding-top:0px; padding-bottom:0px">사이트</div> \
-          <div class="col-sm-2" style="text-align:left;" style="padding-top:0px; padding-bottom:0px">게시판</div> \
-          <div class="col-sm-7" style="text-align:left;" style="padding-top:0px; padding-bottom:0px">마지막 게시물</div> \
-        </div> \
-        <hr style="width: 100%; color: black; height: 2px; background-color:black;" />'
-            
+  str = ''
   for(var i in data) {
     str += ' \
       <div class="row"> \
@@ -675,14 +608,8 @@ function make_scheduler_list(data) {
 
 
 function make_group_list(data) {
-  str = '<div class="row"> \
-          <div class="col-sm-1" style="text-align:center;" style="padding-top:0px; padding-bottom:0px">ID</div> \
-          <div class="col-sm-2" style="text-align:left;" style="padding-top:0px; padding-bottom:0px">사이트</div> \
-          <div class="col-sm-2" style="text-align:left;" style="padding-top:0px; padding-bottom:0px">게시판</div> \
-          <div class="col-sm-7" style="text-align:left;" style="padding-top:0px; padding-bottom:0px">마지막 게시물</div> \
-        </div> \
-        <hr style="width: 100%; color: black; height: 2px; background-color:black;" />'
-            
+  str = ''
+  
   for(var i in data) {
     str += ' \
       <div class="row"> \

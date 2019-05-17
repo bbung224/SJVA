@@ -55,6 +55,22 @@ $("body").on('click', '#link_btn', function(e) {
   window.open(url, "_blank");
 });
 
+// 다운로드 추가
+$("body").on('click', '#download_btn', function(e) {
+  e.preventDefault();
+  id = $(this).data('id')
+  $.ajax({
+    url: '/' + package_name + '/ajax/add_remote',
+    type: "POST", 
+    cache: false,
+    data: {id:id},
+    dataType: "json",
+    success: function (data) {
+      request_search(current_data.paging.current_page);
+    }
+  });
+});
+
 function request_search(page) {
   var formData = get_formdata('#form_search')
   formData += '&page=' + page;
