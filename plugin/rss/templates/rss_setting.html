@@ -588,7 +588,14 @@ function make_scheduler_list(data) {
     str += '<pre>';
     if (data[i].last != null) {
       str += '제목 : ' + data[i].last.title + '<br>';
-      str += '입력시간 : ' + data[i].last_create_time;
+      if (data[i].one_day_more) {
+        str += '입력시간 : ' + '<strong><span style="color:red">' +data[i].last_create_time + '</span></strong>';
+      } else {
+        str += '입력시간 : ' + data[i].last_create_time;
+      }
+        
+
+      
     } else {
       str += '데이터 없음';
     }
