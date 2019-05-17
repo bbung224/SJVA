@@ -16,6 +16,9 @@
         {{ macros.setting_checkbox('auto_start', '시작시 자동실행', value=arg['auto_start'], desc='On : 시작시 자동으로 스케쥴러에 등록됩니다.') }}
         {{ macros.setting_input_text_and_buttons('apikey', 'API Key', [['apikey_btn', '확인']], value=arg['apikey'], desc='https://offcloud.com/#/account') }}
         {{ macros.setting_input_int('web_page_size', '웹 페이지당 게시물 수', value=arg['web_page_size'], min='1', placeholder='30') }}
+        {{ macros.setting_input_text('default_remoteOptionId', 'Default RemoteOptionID', value=arg['default_remoteOptionId'],desc='Cache에서 다운로드 받을 계정') }}
+        {{ macros.setting_input_text('default_folder_id', 'Default FolderID', value=arg['default_folder_id'],desc='Default RemoteOptionID 계정의 폴더 ID') }}
+
         {{ macros.setting_button([['setting_save', '저장']]) }}
       </form>
     {{ macros.m_tab_content_end() }}

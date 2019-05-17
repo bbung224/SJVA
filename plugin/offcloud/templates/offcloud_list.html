@@ -71,6 +71,15 @@ $("body").on('click', '#download_btn', function(e) {
   });
 });
 
+// 캐쉬여부 확인
+$("body").on('click', '#cache_test_btn', function(e) {
+  e.preventDefault();
+  id = $(this).data('id')
+  var url = '/offcloud/cache?magnet=' + id
+  window.open(url, "_self");
+});
+
+
 function request_search(page) {
   var formData = get_formdata('#form_search')
   formData += '&page=' + page;
@@ -100,7 +109,7 @@ function make_list(data) {
     tmp = data[i].title + '<br>'
     tmp += '<a href="'+data[i].link+'" target="_blank">'+ data[i].link +'</a><br>'
     tmp2 = m_button('download_btn', '다운로드 추가', [{'key':'id', 'value':data[i].id}]);
-    tmp2 += m_button('cache_test_btn', '캐쉬여부 확인', [{'key':'id', 'value':data[i].id}]);
+    tmp2 += m_button('cache_test_btn', '캐쉬여부 확인', [{'key':'id', 'value':data[i].link}]);
     tmp2 = m_button_group(tmp2)
     str += m_col(4, tmp+tmp2);
 
