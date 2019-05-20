@@ -1,1 +1,2 @@
 youtube-dl==2019.5.11
+requests[security]
