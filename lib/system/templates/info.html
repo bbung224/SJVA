@@ -51,7 +51,7 @@ function make_scheduler_list(data) {
 
     //tmp = ''+''+'' + data[i].make_time + '<br>';
     //tmp += ''+''+'' + data[i].next_run_time + '<br>';
-    tmp = ''+''+'' + data[i].next_run_time + ' ('+data[i].remain_time+'초)';
+    tmp = ''+''+'' + data[i].next_run_time + '<br>('+data[i].remain_time+')';
     str += m_col(2, tmp);
     tmp = ''+''+'' + data[i].running_timedelta + ' 초<br>';
     str += m_col(1, tmp);
