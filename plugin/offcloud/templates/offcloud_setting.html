@@ -231,7 +231,12 @@ $(document).ready(function(){
     });
   });
 
-
+  // 잡 삭제 버튼
+  $("body").on('click', '#job_test_rss_btn', function(e){
+    e.preventDefault();
+    url = document.getElementById("job_rss_url").value
+    window.open(url, "_blank");
+  });
 });
 
 function make_job_list(data) {
