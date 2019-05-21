@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<div>
+  <nav>
+    {{ macros.m_tab_head_start() }}
+      {{ macros.m_tab_head('쇼 분석', true) }}
+    {{ macros.m_tab_head_end() }}
+  </nav>
+  <div class="tab-content" id="nav-tabContent">
+    
+    {{ macros.m_tab_content_start('쇼 분석', true) }}
+      <form id="form_search" class="form-inline" style="text-align:left">
+        <div class="container-fluid">
+          <div class="row show-grid">
+            <div class="col-md-12 form-inline">
+              <div id="section_list_div"></div>
+              <button id="start_show_analyze_btn" class="btn btn-sm btn-outline-success">분석</button>
+            </div>
+          </div>
+        </div>
+      </form>
+      {{ macros.m_hr_head_top() }}
+      {{ macros.m_row_start('0') }}
+      {{ macros.m_col(1, macros.m_strong('NO')) }}
+      {{ macros.m_col(1, macros.m_strong('Name')) }}
+      {{ macros.m_col(1, macros.m_strong('Type')) }}
+      {{ macros.m_col(1, macros.m_strong('CMD')) }}
+      {{ macros.m_col(3, macros.m_strong('Path')) }}
+      {{ macros.m_col(2, macros.m_strong('Last Run')) }}
+      {{ macros.m_col(1, macros.m_strong('스케쥴링')) }}
+      {{ macros.m_col(2, macros.m_strong('Action')) }}
+      {{ macros.m_row_end() }}
+      {{ macros.m_hr_head_bottom() }}
+
+      <div id="analyze_show_div"></div>
+    {{ macros.m_tab_content_end() }}
+  </div>
+</div> <!--전체-->
+
+<script type="text/javascript">
+var current_data = null;
+
+$(document).ready(function(){
+  var package_name = 'plex';
+
+  $.ajax({
+    url: '/' + package_name + '/ajax/load_tool',
+    type: "POST", 
+    cache: false,
+    data:{},
+    dataType: "json",
+    success: function (data) {
+      current_data = data
+      make_section_list(data.sections)
+      if (data.analyze_show != null) make_analyze_show(data.analyze_show)
+    }
+  });
+
+
+  $("body").on('click', '#start_show_analyze_btn', function(e){
+    e.preventDefault();
+    key = document.getElementById("section_list").value
+    $.ajax({
+      url: '/' + package_name + '/ajax/analyze_show',
+      type: "POST", 
+      cache: false,
+      data:{key:key},
+      dataType: "json",
+      success: function (data) {
+        m_modal(data)
+        make_analyze_show(data)
+      }
+    });
+  });
+
+
+
+});
+
+
+function make_section_list(data) {
+  
+  prev = null
+  if (document.getElementById("section_list") != null) 
+    prev = document.getElementById("section_list").value
+  str = '<select id="section_list" name="section_list" class="form-control form-control-sm">'
+  for(var i in data) {
+    if (data[i].type=='show') {
+      str += '<option value="'+ data[i].key+'">'
+      str += data[i].title
+      str += "</option>"
+    }
+  }
+  str += "</select>"
+  document.getElementById("section_list_div").innerHTML = str;
+  if ( prev != null)
+    document.getElementById("section_list").value = prev
+}
+
+
+function make_analyze_show(data) {
+  str = ''
+  for (i in data) {
+    str += m_row_start();
+    if (data[i].poster != null) {
+      tmp = '<img src="' + data[i].poster + '" class="img-fluid"><br>'
+    }
+    tmp += '<strong>'+data[i].plex_title+'</strong>'
+    str += m_col(2, tmp);
+    
+    tmp = 'ID:' + data[i].job_id
+    for(j in current_data.jobs) {
+      if (current_data.jobs[j].id == data[i].job_id) {
+        if (current_data.jobs[j].name != '') {
+          tmp = current_data.jobs[j].name
+          break
+        }
+      }
+    }
+    str += m_col(1, tmp);
+    if (data[i].folder != null)
+      tmp = data[i].folder + '<br>' + data[i].name
+    else
+      tmp = data[i].name
+    str += m_col(4, tmp);
+    str += m_col(1, data[i].size);
+    str += m_col(1, data[i].speed);
+    tmp = data[i].created_time + '<br>' + data[i].finish_time + '<br>' + data[i].delta
+    str += m_col(2, tmp);
+    str += m_col(2, data[i].log);
+    str += m_row_end();
+    if (i != data.length -1) str += m_hr();
+  }
+  document.getElementById("analyze_show_div").innerHTML = str;
+}
+
+
+
+
+</script>    
+{% endblock %}
