@@ -251,7 +251,7 @@ function make_analyze_show2(show) {
       tmp += '<strong>날짜 에피소드 : </strong>' + show.seasons[j].episode_air_list.length + '건 - ' + show.seasons[j].episode_air_list + '<br><br>'
     }
 
-    if (show.seasons[j].duplicate_count > 0) {
+    if (show.seasons[j].duplicate_list.length > 0) {
       tmp += '<strong>중복 에피소드 : </strong>' + show.seasons[j].duplicate_list.length + '건 - '
       tmp += show.seasons[j].duplicate_list + '<br><br>'
     }
