@@ -143,12 +143,13 @@ $(document).ready(function(){
 
   $("body").on('click', '#library_save_btn', function(e){
     e.preventDefault();
-    if (document.getElementById("library_path").value=='') {
-      $.notify('<strong>라이브러리 폴더를 입력하세요</strong>', {
+    if (document.getElementById("library_path").value=='' || document.getElementById("replace_for_plex_source").value=='' || document.getElementById("replace_for_plex_target").value=='') {
+      $.notify('<strong>라이브러리 폴더, PLEX source, target 값이 없습니다.<br>잘 모르시는 경우 라이브러리 폴더 값을 source, target에 입력하세요</strong>', {
         type: 'warning'
       });
       return
     }
+    
     var formData = get_formdata('#library_setting');
     $.ajax({
       url: '/' + package_name + '/ajax/library_save',
