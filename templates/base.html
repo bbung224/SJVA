@@ -155,6 +155,16 @@
 </html>
 
 <script type="text/javascript">
+$(document).ready(function(){
+  $("body").on('click', '#open_url_btn', function(e) {
+    e.preventDefault();
+    url = $(this).data('url')
+    window.open(url, "_blank");
+  });
+});
+
+
+
 function m_row_start(padding='10', align='center') {
   var str = '<div class="row" style="padding-top: '+padding+'px; padding-bottom:'+padding+'px; align-items:'+align+';">';
   return str;
@@ -286,4 +296,6 @@ function make_page_html(data) {
   document.getElementById("page1").innerHTML = str;
   document.getElementById("page2").innerHTML = str;  
 }
+
+
 </script>
